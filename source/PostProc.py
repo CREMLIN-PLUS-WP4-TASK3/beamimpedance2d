@@ -6,9 +6,10 @@ import os
 #####################################################
 ##Some nice values for the plots
 kappa_value=10**6
-h=0.0403
+h=0.041
 b=0.04
-R_Ohm=1.0 /(kappa_value*pi*(h**2-b**2))
+length=1.0
+R_Ohm=length /(kappa_value*pi*(h**2-b**2))
 f_skin=1.0 /(pi*mu0*kappa_value*(h-b)**2)
 #####################################################
 
@@ -20,16 +21,19 @@ def Zlong(Elr,Eli,Jszr,Jszi,q):
     return Zl
 
 
-def Ztrans(Elr,Eli,Jszr,Jszi,q, omega, beta):
+def Ztrans(Elr,Eli,Jszr,Jszi, omega, beta,xd,yd):
     Jzrfct=Jszr
     Jzifct=Jszi
-    #Vdip=FunctionSpace(mesh,'CG',1)
-    x=Expression('x[0]')
-    DM=assemble(x*Jzrfct*dx)
+    
+    if horizontal:
+        DipTest=Expression('x[0]-xd',xd=xd)
+    else:
+        DipTest=Expression('x[1]-yd',yd=yd)
+    
+    #x=Expression('x[0]')
+    DM=assemble(DipTest*Jzrfct*dx)
     print "DM: ", DM
-    #print "qd: ", q*d
-    d=1
-    Ztr=-beta*c0/(omega*(q*d)**2) *(assemble(inner(Elr,Jzrfct)*dx)+0*assemble(inner(Eli,Jzifct)*dx) \
+    Ztr=-beta*c0/(omega*DM**2) *(assemble(inner(Elr,Jzrfct)*dx)+0*assemble(inner(Eli,Jzifct)*dx) \
                 +I*(-0*assemble(inner(Elr,Jzifct)*dx)+assemble(inner(Eli,Jzrfct)*dx) ))
     #check me! I'm just the power loss integral!
     return Ztr
@@ -46,7 +50,100 @@ def CplxImpExport(filename,f,Z):
 
 def PlotZlong(f,Zlong,Zlongloss,Zsc_ana):
     fig=pylab.figure(figsize=(20,12))
-    pylab.title('Longitudinal Impedance')
+    pylab.suptitle('Longitudinal Impedance',fontsize=30)
+    
+    RElog=fig.add_subplot(221)
+    try:
+        pylab.loglog(f,numpy.fabs(numpy.asarray(Zlong).real),f,numpy.fabs(numpy.asarray(Zlongloss).real), linewidth=4 )
+    except:
+        print ("Zero loglogplot")
+        #pylab.axhline(y=R_Ohm, color='k')
+    pylab.axvline(x=f_skin, linewidth=4, color='k')
+    pylab.axhline(y=R_Ohm, linewidth=4, color='k')
+        ## legend
+    pylab.legend((r'FEM real',r'Zloss real'), shadow = True, fontsize=25)
+
+    ltext = pylab.gca().get_legend().get_texts()
+
+    pylab.xlabel(r'$f \;$ [Hz]', fontsize=25)
+    pylab.ylabel(r'Re $\{Z_\parallel \} [\Omega]$', fontsize=25)
+    #pylab.grid()
+    for label in RElog.get_xticklabels() + RElog.get_yticklabels():
+        label.set_size(25)
+    for line in RElog.get_xticklines() + RElog.get_yticklines():
+        line.set_markersize(10)
+        line.set_markeredgewidth(2)
+
+    
+    IMlog=fig.add_subplot(222)
+    try:   
+        pylab.loglog(f,abs(numpy.asarray(Zlong).imag),f,abs(numpy.asarray(Zsc_ana).imag), linewidth=4 )
+
+        #pylab.axvline(x=f_skin, linewidth=4, color='k')
+        ## legend
+        pylab.legend(( r'FEM imag',r'Zsc_ana imag'), shadow = True, fontsize=25)
+        ltext = pylab.gca().get_legend().get_texts()
+        pylab.setp(ltext[0], fontsize = 25)
+        pylab.xlabel(r'$f \;$ [Hz]', fontsize=25)
+        pylab.ylabel(r'Im $\{Z_\perp \} [\Omega/\mathrm{m}]$', fontsize=25)
+        #pylab.title(tit)
+        #pylab.setp(ltext[1], fontsize = 20)
+        for label in IMlog.get_xticklabels() + IMlog.get_yticklabels():
+            label.set_size(20)   #Fontsize Labels
+        for line in IMlog.get_xticklines() + IMlog.get_yticklines():
+            line.set_markersize(10) #Lenth of ticks
+            line.set_markeredgewidth(2) #Thickness of ticks
+    except:
+        print ("Zero loglogplot")
+    
+    RElin=fig.add_subplot(223)
+    try:
+        pylab.semilogx(f,numpy.asarray(Zlong).real,f,numpy.asarray(Zlongloss).real, linewidth=4 )
+        #pylab.axhline(y=R_Ohm, color='k')
+        #pylab.axvline(x=f_skin, linewidth=4, color='k')
+        #pylab.axhline(y=R_Ohm, color='k')
+        pylab.axvline(x=f_skin, linewidth=4, color='k')
+        pylab.axhline(y=R_Ohm, linewidth=4, color='k')
+        ## legend
+        pylab.legend((r'Zlong real',r'Zloss real'), shadow = True, fontsize=25)
+
+        ltext = pylab.gca().get_legend().get_texts()
+
+        pylab.xlabel(r'$f \;$ [Hz]', fontsize=25)
+        pylab.ylabel(r'Re $\{Z_\parallel \} [\Omega]$', fontsize=25)
+        #pylab.grid()
+        for label in RElin.get_xticklabels() + RElin.get_yticklabels():
+            label.set_size(25)
+        for line in RElin.get_xticklines() + RElin.get_yticklines():
+            line.set_markersize(10)
+            line.set_markeredgewidth(2)
+    except:
+        print ("hmmmm")
+    
+    IMlin=fig.add_subplot(224)
+    try:   
+        pylab.semilogx(f,numpy.asarray(Zlong).real,f,numpy.asarray(Zlongloss).real , linewidth=4 )
+        #pylab.axhline(y=R_Ohm, color='k')
+        #pylab.axvline(x=f_skin, linewidth=4, color='k')
+        #pylab.axhline(y=R_Ohm, color='k')
+        #pylab.axvline(x=f_skin, linewidth=4, color='k')
+        ## legend
+        pylab.legend(('FEM imag',r'Zsc_ana imag'), shadow = True, fontsize=25)
+        ltext = pylab.gca().get_legend().get_texts()
+        pylab.setp(ltext[0], fontsize = 25)
+        pylab.xlabel(r'$f \;$ [Hz]', fontsize=25)
+        pylab.ylabel(r'Im $\{Z_\parallel \} [\Omega]$', fontsize=25)
+        #pylab.title(tit)
+        #pylab.setp(ltext[1], fontsize = 20)
+        for label in IMlin.get_xticklabels() + IMlin.get_yticklabels():
+            label.set_size(20)   #Fontsize Labels
+        for line in IMlin.get_xticklines() + IMlin.get_yticklines():
+            line.set_markersize(10) #Lenth of ticks
+            line.set_markeredgewidth(2) #Thickness of ticks
+    except:
+        print ("hmmmm")
+    
+    """
     pylab.subplot(221)    
     try:
         pylab.loglog(f,numpy.fabs(numpy.asarray(Zlong).real),f,numpy.fabs(numpy.asarray(Zlongloss).real))
@@ -92,80 +189,120 @@ def PlotZlong(f,Zlong,Zlongloss,Zsc_ana):
     ltext = pylab.gca().get_legend().get_texts()
     pylab.setp(ltext[0], fontsize = 20)
     pylab.setp(ltext[1], fontsize = 20)
+    """
+    
     #pylab.show()
     return None
 
 
 def PlotZtrans(f,Ztrans,ZscTr_ana,tit):
-    fig0=pylab.figure(figsize=(20,12))
-    pylab.title('Transverse Impedance')
-    pylab.subplot(121)    
+    fig=pylab.figure(figsize=(20,12))
+    pylab.suptitle(tit, fontsize=30)
+    RE=fig.add_subplot(121)
+    #pylab.subplot(121)    
     try:
-        pylab.loglog(f,numpy.fabs(numpy.asarray(Ztrans).real) )
+        RE=pylab.loglog(f,numpy.fabs(numpy.asarray(Ztrans).real),color='r' , linewidth=4 )
         #pylab.axhline(y=R_Ohm, color='k')
         pylab.axvline(x=f_skin, linewidth=4, color='k')
         ## legend
-        pylab.legend((r'Ztrans real'), shadow = True)
+        pylab.legend((r'FEM real',r'$f_{skin}$'), shadow = True, fontsize=25)
+
         ltext = pylab.gca().get_legend().get_texts()
-        pylab.setp(ltext[0], fontsize = 20)
-        #pylab.setp(ltext[1], fontsize = 20)
+
+        pylab.xlabel(r'$f \;$ [Hz]', fontsize=25)
+        pylab.ylabel(r'Re $\{Z_\perp \} [\Omega/\mathrm{m}]$', fontsize=25)
+        #pylab.grid()
+        for label in RE.get_xticklabels() + RE.get_yticklabels():
+            label.set_size(25)
+        for line in RE.get_xticklines() + RE.get_yticklines():
+            line.set_markersize(10)
+            line.set_markeredgewidth(2)
     except:
         print ("Zero loglogplot")
         #raise
 
 
-    pylab.subplot(122) 
+
+    IM=fig.add_subplot(122)
+    #pylab.subplot(122) 
     try:   
-        pylab.loglog(f,numpy.fabs(numpy.asarray(Ztrans).imag),f,numpy.fabs(numpy.asarray(ZscTr_ana).imag))
+        pylab.loglog(f,numpy.fabs(numpy.asarray(Ztrans).imag),f,numpy.fabs(numpy.asarray(ZscTr_ana).imag), linewidth=4)
         #pylab.axhline(y=R_Ohm, color='k')
         #pylab.axvline(x=f_skin, linewidth=4, color='k')
         ## legend
-        pylab.legend(( r'Ztrans imag','Zsc_ana imag' ), shadow = True)
+        pylab.legend(( r'FEM imag','Zsc_ana imag' ), shadow = True)
         ltext = pylab.gca().get_legend().get_texts()
-        pylab.setp(ltext[0], fontsize = 20)
-        pylab.title(tit)
+        pylab.setp(ltext[0], fontsize = 25)
+        pylab.xlabel(r'$f \;$ [Hz]', fontsize=25)
+        pylab.ylabel(r'Im $\{Z_\perp \} [\Omega/\mathrm{m}]$', fontsize=25)
+        #pylab.title(tit)
         #pylab.setp(ltext[1], fontsize = 20)
+        for label in IM.get_xticklabels() + IM.get_yticklabels():
+            label.set_size(20)   #Fontsize Labels
+        for line in IM.get_xticklines() + IM.get_yticklines():
+            line.set_markersize(10) #Lenth of ticks
+            line.set_markeredgewidth(2) #Thickness of ticks
     except:
         print ("Zero loglogplot")
     #######################
     #pylab.show()
     return None
-
 
 def PlotZtranslinear(f,Ztrans,ZscTr_ana,tit):
-    fig0=pylab.figure(figsize=(20,12))
-    pylab.title('Transverse Impedance')
-    pylab.subplot(121)    
+    fig=pylab.figure(figsize=(20,12))
+    pylab.suptitle(tit, fontsize=30)
+    RE=fig.add_subplot(121)
+    #pylab.subplot(121)    
     try:
-        pylab.semilogx(f,numpy.asarray(Ztrans).real )
+        RE=pylab.semilogx(f,numpy.fabs(numpy.asarray(Ztrans).real),color='r' , linewidth=4 )
         #pylab.axhline(y=R_Ohm, color='k')
         pylab.axvline(x=f_skin, linewidth=4, color='k')
         ## legend
-        pylab.legend((r'Ztrans real'), shadow = True)
+        pylab.legend((r'FEM real',r'$f_{skin}$'), shadow = True, fontsize=25)
+
         ltext = pylab.gca().get_legend().get_texts()
-        pylab.setp(ltext[0], fontsize = 20)
-        #pylab.setp(ltext[1], fontsize = 20)
+
+        pylab.xlabel(r'$f \;$ [Hz]', fontsize=25)
+        pylab.ylabel(r'Re $\{Z_\perp \} [\Omega/\mathrm{m}]$', fontsize=25)
+        #pylab.grid()
+        for label in RE.get_xticklabels() + RE.get_yticklabels():
+            label.set_size(25)
+        for line in RE.get_xticklines() + RE.get_yticklines():
+            line.set_markersize(10)
+            line.set_markeredgewidth(2)
     except:
-        print ("Zero loglogplot")
+        print ("hmmmm")
         #raise
 
 
-    pylab.subplot(122) 
+
+    IM=fig.add_subplot(122)
+    #pylab.subplot(122) 
     try:   
-        p=pylab.semilogx(f,numpy.asarray(Ztrans).imag,f,numpy.asarray(ZscTr_ana).imag)
-        pylab.title(tit)
+        pylab.semilogx(f,numpy.fabs(numpy.asarray(Ztrans).imag),f,numpy.fabs(numpy.asarray(ZscTr_ana).imag), linewidth=4)
         #pylab.axhline(y=R_Ohm, color='k')
         #pylab.axvline(x=f_skin, linewidth=4, color='k')
         ## legend
-        pylab.legend(( r'Ztrans imag','Zsc_ana imag' ), shadow = True)
+        pylab.legend(( r'FEM imag','Zsc_ana imag' ), shadow = True)
         ltext = pylab.gca().get_legend().get_texts()
-        pylab.setp(ltext[0], fontsize = 20)
+        pylab.setp(ltext[0], fontsize = 25)
+        pylab.xlabel(r'$f \;$ [Hz]', fontsize=25)
+        pylab.ylabel(r'Im $\{Z_\perp \} [\Omega/\mathrm{m}]$', fontsize=25)
+        #pylab.title(tit)
         #pylab.setp(ltext[1], fontsize = 20)
+        for label in IM.get_xticklabels() + IM.get_yticklabels():
+            label.set_size(20)   #Fontsize Labels
+        for line in IM.get_xticklines() + IM.get_yticklines():
+            line.set_markersize(10) #Lenth of ticks
+            line.set_markeredgewidth(2) #Thickness of ticks
     except:
-        print ("Zero loglogplot")
+        print ("hmmmm")
     #######################
     #pylab.show()
     return None
+
+
+
 
 def PlotWallCurrent(f,TotalCurrent):
     pylab.figure(figsize=(20,12))
@@ -189,6 +326,43 @@ def RealToComplex(Re,Im):
 """
 #################################################################################################################
 #alt
+
+
+
+def pppPlotZtranslinear(f,Ztrans,ZscTr_ana,tit):
+    fig0=pylab.figure(figsize=(20,12))
+    pylab.suptitle(tit)
+    pylab.subplot(121)    
+    try:
+        pylab.semilogx(f,numpy.asarray(Ztrans).real )
+        #pylab.axhline(y=R_Ohm, color='k')
+        pylab.axvline(x=f_skin, linewidth=4, color='k')
+        ## legend
+        pylab.legend((r'Ztrans real'), shadow = True)
+        ltext = pylab.gca().get_legend().get_texts()
+        pylab.setp(ltext[0], fontsize = 20)
+        #pylab.setp(ltext[1], fontsize = 20)
+    except:
+        print ("Zero loglogplot")
+        #raise
+
+
+    pylab.subplot(122) 
+    try:   
+        p=pylab.semilogx(f,numpy.asarray(Ztrans).imag,f,numpy.asarray(ZscTr_ana).imag)
+        #pylab.title(tit)
+        #pylab.axhline(y=R_Ohm, color='k')
+        #pylab.axvline(x=f_skin, linewidth=4, color='k')
+        ## legend
+        pylab.legend(( r'Ztrans imag','Zsc_ana imag' ), shadow = True)
+        ltext = pylab.gca().get_legend().get_texts()
+        pylab.setp(ltext[0], fontsize = 20)
+        #pylab.setp(ltext[1], fontsize = 20)
+    except:
+        print ("Zero loglogplot")
+    #######################
+    #pylab.show()
+    return None
 def n_div(ftr_,fti_,flr_,fli_,omega,beta,mesh,tspace):
     Vdivt = tspace
     Vdivl = FunctionSpace(mesh, "CG", div_long_order) 

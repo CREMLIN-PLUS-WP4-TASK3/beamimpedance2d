@@ -20,11 +20,11 @@ __builtin__.I=complex(0,1)
 
 
 ###Approximation Orders
-__builtin__.div_long_order=1
-__builtin__.curl_long_order=1
+__builtin__.div_long_order=3
+__builtin__.curl_long_order=3
 
-__builtin__.curl_order=1
-__builtin__.div_order=1
+__builtin__.curl_order=3
+__builtin__.div_order=3
 
 
 ###Result folder
@@ -36,11 +36,11 @@ except:
 
 ###Options
 __builtin__.logscale=True
-__builtin__.dispersive=True
+__builtin__.dispersive=False
 __builtin__.plot3Dflag=False
-__builtin__.dipole=False
+__builtin__.dipole=True
 __builtin__.horizontal=True
-__builtin__.dataexport=True
+__builtin__.dataexport=False
 __builtin__.wallcurrent=False    #compute and export wall current
 __builtin__.SIBC=False
 

@@ -48,10 +48,11 @@ class RingDipole(Expression):
         sinPhi=(x[1]-self.yd_)/r
         if (r>self.a_-self.eps_ and r<self.a_+self.eps_):
             if horizontal:
-                if (r<self.a_):
-                    values[0]=(r-self.a_+self.eps_)*cosPhi
-                else:
-                    values[0]=(r-self.a_+self.eps_)*cosPhi 
+                values[0]=cosPhi
+                #if (r<self.a_):
+                #    values[0]=(r-self.a_+self.eps_)*cosPhi
+                #else:
+                #    values[0]=(r-self.a_+self.eps_)*cosPhi 
             else:
                 values[0]=(r-self.a_+self.eps_)*sinPhi
         else:
@@ -122,6 +123,7 @@ def ExCurrentShiftedDipole(mesh,subdomains,q,a,eps,xd,yd):
     #Dipolemoment=assemble(DipExFunction*DipTest*dx)
     DipTestFunction=project(Source,Vdip)
     DipolemomentTEST=assemble(DipTestFunction*DipTest*dx)
+    print("Dipole Moment: " , DipolemomentTEST)
     #######################################
     
     return Source/DipolemomentTEST

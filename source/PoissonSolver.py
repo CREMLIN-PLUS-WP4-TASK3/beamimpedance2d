@@ -10,16 +10,22 @@ def CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
     Phir=Function(H1)
     Phii=Function(H1)
     
-    ar=inner(grad(vr),epsilon*grad(ur))*dx +inner(grad(vr),(kappa/omega)*grad(ui))*dx
-    ai=inner(grad(vi),epsilon*grad(ui))*dx -inner(grad(vi),(kappa/omega)*grad(ur))*dx
+    #The stiffness matrices
+    ar=inner(grad(vr),epsilon*grad(ur))*dx +inner(grad(vr),(kappa/omega)*grad(ui))*dx 
+    ai=inner(grad(vi),epsilon*grad(ui))*dx -inner(grad(vi),(kappa/omega)*grad(ur))*dx  
+    
+    #The mass matrices
+    br=(omega/(beta*c0))**2 * (inner(vr,epsilon*ur)*dx +inner(vr,(kappa/omega)*ui)*dx )
+    bi=(omega/(beta*c0))**2 * (inner(vi,epsilon*ui)*dx -inner(vi,(kappa/omega)*ur)*dx )
+    
+    #The right hand side
     RHSr=1/(beta*c0) *vr*Jszr*dx
     RHSi=1/(beta*c0) *vi*Jszi*dx
     
-    eq= ar+ai==RHSr+RHSi
+    eq= ar+ai +br+bi==RHSr+RHSi
+    
     
     Zero = Expression(('0.0','0.0'))
-    
-
     def u0_boundary(x, on_boundary):    # returns boolean if x on boundary
         return on_boundary
 
@@ -27,8 +33,9 @@ def CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
     
     
     set_log_level(PROGRESS)
+    solve(eq, Phi,BC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
     #solve(eq, Phi,BC,solver_parameters={"linear_solver": "gmres","preconditioner": "sor"})
-    solve(eq, Phi,BC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
+    #solve(eq, Phi,BC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
     (Phir,Phii)=Phi.split(deepcopy=False) 
     
     if(plot3Dflag):

@@ -38,14 +38,15 @@ zero=Constant(0.0)
 #Beam parameters (SI units)
 px=0.0  #x-position
 py=0.0  #y-position
-a=0.005  #beam radius
+a=0.01  #beam radius
 eps_mesh=0.000005   #Parameter for delta function representation
 eps=eps_mesh*0.75   #Apply Delta-function representation on little smaller epsilon (safety-factor)
-length=0.0254#1.0
+#length=0.0254
+length=1.0
 
 #beta=0.947485301 #2GeV protons
 #beta=0.999999
-beta=0.999999
+beta=0.9
 
 gamma=1/sqrt(1-beta**2)
 bgsinv= 1.0/(beta**2 *gamma**2) # 1/(beta^2gamma^2)
@@ -71,10 +72,10 @@ g_ana=0.25+ln(b/a)
 
 ###############################################################
 #Frequency stepping
-maxfpoints=22
+maxfpoints=31
 #logscale
-startfexp=6.0
-pointsperdecade=7.0
+startfexp=3.0
+pointsperdecade=5.0
 #linear scale
 startf=5e9
 stopf=5e9
@@ -97,19 +98,19 @@ if dispersive:
 #MeshFileName='EllipticPipeDeltaZt'
 #MeshFileName='simplepipeDeltaZt_S2'
 
-#MeshFileName='collimatorSIBC'
-###MeshFileName='simplepipeDeltaZt'
+#MeshFileName='collimator'
+#MeshFileName='simplepipeDeltaZt'
 
-#MeshFileName='FerriteRieg'
+#MeshFileName='simplepipe'
 
-#MeshFileName='ThinShellPipeZt_eps'
-
-###MeshFileName='simplepipeZlspch'
+MeshFileName='ThinShellPipeZt_eps'
+#MeshFileName='ThinShellPipeGNDfine'
+##MeshFileName='simplepipeZlspch'
 
 
 #MeshFileName='extrudepipe'
 #MeshFileName='extrudepipe3fineoutside'
-MeshFileName='FerriteRing'
+#MeshFileName='FerriteRingZt'
 [mesh,subdomains]= MeshGenerator.MeshImport(MeshFileName)
 print ("Mesh imported and converted! File: " + MeshFileName )
 #############################################################
@@ -222,7 +223,7 @@ else:
 
 BeamMaterial=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,0.0)
 VacuumMaterial=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,0.0)
-Steel=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,1.0e4)
+Steel=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,1.0e6)
 Copper=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,1.0e6)
 Grounding=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,1.0e6) #1e-6
 Dielectric=Material.MaterialProperties(1.0*nu0,0.0,100.0*eps0,0.0)
@@ -332,7 +333,8 @@ for fpointiter in range(maxfpoints):
     ######
     #Run curlcurl solver
     #[Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurl(mesh,omega, beta, epsilon, kappa, nur, RHSsr, RHSsi, RHSvr,RHSvi)
-    [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSvr,RHSvi)   #sign RHSvr
+    [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr/omega**2, RHSsi/omega**2, RHSvr/omega**2,RHSvi/omega**2)   #sign RHSvr
+    #Rescaling with omega brings LF stabilization???
     ######
     
     #######################################################
@@ -344,10 +346,10 @@ for fpointiter in range(maxfpoints):
     
     
     #These are both in H(curl)
-    Etr=Ecurltr+Edivtr
-    Eti=Ecurlti+Edivti
-    Elr=Ecurllr+Edivlr
-    Eli=Ecurlli+Edivli
+    Etr=omega**2*Ecurltr+Edivtr
+    Eti=omega**2*Ecurlti+Edivti
+    Elr=omega**2*Ecurllr+Edivlr
+    Eli=omega**2*Ecurlli+Edivli
     ######
     """
     filer = File("Edivtr.pvd")
@@ -363,7 +365,7 @@ for fpointiter in range(maxfpoints):
     ##################################################################################################
     #Calculate Impedance                                  
     if dipole:
-        Ztrans_full[fpointiter]=length*PostProc.Ztrans(Elr, Eli, Jszr, Jszi, q, omega, beta)
+        Ztrans_full[fpointiter]=length*PostProc.Ztrans(Elr, Eli, Jszr, Jszi, omega, beta, px,py)
         Ztrans_ind[fpointiter]=Ztrans_full[fpointiter]-ZscTr_ana_direct[fpointiter] #test!
         print
         print ("Ztrans_full= " , Ztrans_full[fpointiter], " at ", omega/(2*pi),"Hz")
@@ -421,10 +423,13 @@ if dataexport:
 #############################################################
 #Plot impedance
 if dipole:
-    PostProc.PlotZtranslinear(f,Ztrans_full,ZscTr_ana,'full')
-    PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'indirect')
+    PostProc.PlotZtranslinear(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
+    PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
 else:
-    PostProc.PlotZlong(f,Zlong,Zlongloss,Zsc_ana)
+    if wallcurrent:
+        PostProc.PlotZlong(f,Zlong,Zlongloss,Zsc_ana)
+    else:
+        PostProc.PlotZlong(f,Zlong,Zlong,Zsc_ana)
 ##############################################################
 
 
