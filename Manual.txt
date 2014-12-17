@@ -7,9 +7,13 @@ Workflow:
 Impedance will be plotted and saved in a file in the results folder. Be aware that resultfiles are overwritten, so make a copy or rename.
 
 
+
 Configuration of BeamImpedance2D:
 
 1. The file BeamImpedance2D.py:
+
+Include the mesh file name without extension
+MeshFileName='simplepipe'
 
 #Beam parameters (SI units)
 px/py  beam position coordinates
@@ -17,7 +21,7 @@ a=0.01  beam radius.
 eps_mesh=0.000005   #Parameter for delta function representation
 eps=eps_mesh*0.75   #Apply Delta-function representation on little smaller epsilon (safety-factor)
 
-These values should be set in accordance to the ones specified in the geometry file.
+These values should be set in accordance to the ones specified in the geometry file. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 length=1  #the length of the structure. (This is just a scaling factor)
 
@@ -49,19 +53,20 @@ stopf=5e9
 
 
 
-Include the mesh file name without extension
-MeshFileName='simplepipe'
 
 
-Set materials and material properties:
+
+Set materials and material properties: 
 
 BeamMaterial=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,0.0)
 VacuumMaterial=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,0.0)
 Steel=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,1.0e6)
 Copper=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,1.0e6)
 Grounding=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,1.0e6) #1e-6
-Dielectric=Material.MaterialProperties(1.0*nu0,0.0,100.0*eps0,0.0)
+Dielectric=Material.MaterialProperties(1.0*nu0,0.0,100.0*eps0,0.0r
     
+
+These values should be set in accordance to the ones specified in the geometry file. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
 [nur,nui,epsilon,kappa]= MeshGenerator.MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferrite,Grounding,Dielectric)
 
@@ -70,7 +75,7 @@ Dielectric=Material.MaterialProperties(1.0*nu0,0.0,100.0*eps0,0.0)
 
 2. Set properties in globals.py
 
-
+3. run BeamImpedance2D.py script in python
 
  
 
