@@ -1,3 +1,10 @@
+"""
+FEniCS 2D beam coupling impedance simulation in frequency domain
+
+by Uwe Niedermayer 2014
+"""
+
+
 from dolfin import *
 
 ###################################################################
@@ -127,7 +134,6 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
          
   
     if SIBC:
-        kappa_s=1e4
         delta=(2.0/(omega*mu0*kappa_s))**0.5
         kr=-1.0/delta
         ki=-1.0/delta

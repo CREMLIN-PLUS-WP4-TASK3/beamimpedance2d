@@ -1,3 +1,9 @@
+"""
+FEniCS 2D beam coupling impedance simulation in frequency domain
+
+by Uwe Niedermayer 2014
+"""
+
 from dolfin import *
 import numpy
 import pylab
@@ -122,7 +128,7 @@ def PlotZlong(f,Zlong,Zlongloss,Zsc_ana):
     
     IMlin=fig.add_subplot(224)
     try:   
-        pylab.semilogx(f,numpy.asarray(Zlong).real,f,numpy.asarray(Zlongloss).real , linewidth=4 )
+        pylab.semilogx(f,numpy.asarray(Zlong).imag,f,numpy.asarray(Zlongloss).imag , linewidth=4 )
         #pylab.axhline(y=R_Ohm, color='k')
         #pylab.axvline(x=f_skin, linewidth=4, color='k')
         #pylab.axhline(y=R_Ohm, color='k')

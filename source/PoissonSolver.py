@@ -1,3 +1,9 @@
+"""
+FEniCS 2D beam coupling impedance simulation in frequency domain
+
+by Uwe Niedermayer 2014
+"""
+
 from dolfin import *
 def CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
     H1 = FunctionSpace(mesh, "CG",div_long_order)    #Space for the Potential

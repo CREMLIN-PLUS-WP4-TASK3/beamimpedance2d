@@ -1,8 +1,8 @@
-'''
-Created on Apr 1, 2014
+"""
+FEniCS 2D beam coupling impedance simulation in frequency domain
 
-@author: niedermayer
-'''
+by Uwe Niedermayer 2014
+"""
 
 import numpy
 import pylab

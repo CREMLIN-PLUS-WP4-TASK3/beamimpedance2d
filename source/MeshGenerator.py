@@ -1,3 +1,9 @@
+"""
+FEniCS 2D beam coupling impedance simulation in frequency domain
+
+by Uwe Niedermayer 2014
+"""
+
 import os
 from dolfin import *
 from dolfin_utils import meshconvert

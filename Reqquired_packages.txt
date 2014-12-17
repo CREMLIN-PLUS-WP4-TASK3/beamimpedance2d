@@ -1,0 +1,14 @@
+Required packages:
+
+
+Mesh generation: Gmsh, see www.geuz.org/gmsh
+
+Mesh conversion: Dolfin-Convert: www.people.sc.fsu.edu/˜jburkardt/py src/dolfinconvert/dolfin-convert.html (now included in dolfin_utils)
+
+Python 2.7.6 with packages
+
+- dolfin (FEniCS) , dolfin_utils
+- pylab (matplotlib)
+- scipy (bessel functions)
+- numpy
+- math, os, __builtin__

@@ -33,20 +33,37 @@ zero=Constant(0.0)
 
 
 
+#############################################################
+#Import mesh
+MeshFileName='EllipticPipeDeltaZt'
+#MeshFileName='simplepipeDeltaZt_S2'
+#MeshFileName='collimator_shifted'
+#MeshFileName='simplepipeDeltaZt'
+#MeshFileName='simplepipe'
+#MeshFileName='ThinShellPipeZt_eps'
+#MeshFileName='ThinShellPipeGNDfine'
+##MeshFileName='simplepipeZlspch'
+#MeshFileName='extrudepipe'
+#MeshFileName='extrudepipe3fineoutside'
+#MeshFileName='FerriteRingZt'
+[mesh,subdomains]= MeshGenerator.MeshImport(MeshFileName)
+print ("Mesh imported and converted! File: " + MeshFileName )
+#############################################################
+
 
 ######################################################################################
 #Beam parameters (SI units)
 px=0.0  #x-position
 py=0.0  #y-position
 a=0.01  #beam radius
-eps_mesh=0.000005   #Parameter for delta function representation
-eps=eps_mesh*0.75   #Apply Delta-function representation on little smaller epsilon (safety-factor)
+s_mesh=0.000005   #Parameter for delta function representation
+eps=s_mesh*0.75   #Apply Delta-function representation on little smaller epsilon (safety-factor)
 #length=0.0254
 length=1.0
 
 #beta=0.947485301 #2GeV protons
-#beta=0.999999
 beta=0.9
+#beta=0.9
 
 gamma=1/sqrt(1-beta**2)
 bgsinv= 1.0/(beta**2 *gamma**2) # 1/(beta^2gamma^2)
@@ -60,19 +77,19 @@ q=1.0  #Charge (As)
 
 ###########################################################################################################
 # Variables: (SI units)
-# Set these for analytic reference
-b=0.04
-h=0.0403
-h2=0.1
+# Set these for analytic reference in the plots
+b=0.04 #pipe inner radius
+h=0.0403 #pipe outer radius
+h2=0.1 #boundary radius
 #length=1.0
-g_ana=0.25+ln(b/a)
+g_ana=0.25+ln(b/a) #longitudinal space charge impedance geometry factor
 #print('g_ana: ',g_ana)
 ###########################################################################################################
 
 
 ###############################################################
 #Frequency stepping
-maxfpoints=31
+maxfpoints=31 #Number of frequency points to compute
 #logscale
 startfexp=3.0
 pointsperdecade=5.0
@@ -93,27 +110,7 @@ if dispersive:
 
 
 
-#############################################################
-#Import mesh
-#MeshFileName='EllipticPipeDeltaZt'
-#MeshFileName='simplepipeDeltaZt_S2'
 
-#MeshFileName='collimator'
-#MeshFileName='simplepipeDeltaZt'
-
-#MeshFileName='simplepipe'
-
-MeshFileName='ThinShellPipeZt_eps'
-#MeshFileName='ThinShellPipeGNDfine'
-##MeshFileName='simplepipeZlspch'
-
-
-#MeshFileName='extrudepipe'
-#MeshFileName='extrudepipe3fineoutside'
-#MeshFileName='FerriteRingZt'
-[mesh,subdomains]= MeshGenerator.MeshImport(MeshFileName)
-print ("Mesh imported and converted! File: " + MeshFileName )
-#############################################################
 
 
 ##############################################################
@@ -159,7 +156,7 @@ Jcondi=Function(H1)
 ##############################################################
 ###Sources
 if dipole:
-    Jszr=project(RHS.ExCurrentShiftedDipole(mesh,subdomains,q,a,eps,0.0,0.0),H1)  ####!!!
+    Jszr=project(RHS.ExCurrentShiftedDipole(mesh,subdomains,q,a,eps,px,py),H1)  ####!!!
     #Jszr=project(RHS.ExCurrentShifted(mesh,subdomains,q,a,0.0,d/2.0)-RHS.ExCurrentShifted(mesh,subdomains,q,a,0.0,-d/2.0),Vcurllr)
     Monointegral=assemble(Jszr*dx)
     if horizontal:
