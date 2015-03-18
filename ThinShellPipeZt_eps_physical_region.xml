@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dolfin xmlns:dolfin="http://fenicsproject.org">
-  <mesh_function type="uint" dim="2" size="44948">
+  <mesh_function type="uint" dim="2" size="44862">
     <entity index="0" value="1"/>
     <entity index="1" value="1"/>
     <entity index="2" value="1"/>
@@ -1541,14 +1541,14 @@
     <entity index="1537" value="1"/>
     <entity index="1538" value="1"/>
     <entity index="1539" value="1"/>
-    <entity index="1540" value="1"/>
-    <entity index="1541" value="1"/>
-    <entity index="1542" value="1"/>
-    <entity index="1543" value="1"/>
-    <entity index="1544" value="1"/>
-    <entity index="1545" value="1"/>
-    <entity index="1546" value="1"/>
-    <entity index="1547" value="1"/>
+    <entity index="1540" value="2"/>
+    <entity index="1541" value="2"/>
+    <entity index="1542" value="2"/>
+    <entity index="1543" value="2"/>
+    <entity index="1544" value="2"/>
+    <entity index="1545" value="2"/>
+    <entity index="1546" value="2"/>
+    <entity index="1547" value="2"/>
     <entity index="1548" value="2"/>
     <entity index="1549" value="2"/>
     <entity index="1550" value="2"/>
@@ -2049,36 +2049,36 @@
     <entity index="2045" value="2"/>
     <entity index="2046" value="2"/>
     <entity index="2047" value="2"/>
-    <entity index="2048" value="2"/>
-    <entity index="2049" value="2"/>
-    <entity index="2050" value="2"/>
-    <entity index="2051" value="2"/>
-    <entity index="2052" value="2"/>
-    <entity index="2053" value="2"/>
-    <entity index="2054" value="2"/>
-    <entity index="2055" value="2"/>
-    <entity index="2056" value="2"/>
-    <entity index="2057" value="2"/>
-    <entity index="2058" value="2"/>
-    <entity index="2059" value="2"/>
-    <entity index="2060" value="2"/>
-    <entity index="2061" value="2"/>
-    <entity index="2062" value="2"/>
-    <entity index="2063" value="2"/>
-    <entity index="2064" value="2"/>
-    <entity index="2065" value="2"/>
-    <entity index="2066" value="2"/>
-    <entity index="2067" value="2"/>
-    <entity index="2068" value="2"/>
-    <entity index="2069" value="2"/>
-    <entity index="2070" value="2"/>
-    <entity index="2071" value="2"/>
-    <entity index="2072" value="2"/>
-    <entity index="2073" value="2"/>
-    <entity index="2074" value="2"/>
-    <entity index="2075" value="2"/>
-    <entity index="2076" value="2"/>
-    <entity index="2077" value="2"/>
+    <entity index="2048" value="3"/>
+    <entity index="2049" value="3"/>
+    <entity index="2050" value="3"/>
+    <entity index="2051" value="3"/>
+    <entity index="2052" value="3"/>
+    <entity index="2053" value="3"/>
+    <entity index="2054" value="3"/>
+    <entity index="2055" value="3"/>
+    <entity index="2056" value="3"/>
+    <entity index="2057" value="3"/>
+    <entity index="2058" value="3"/>
+    <entity index="2059" value="3"/>
+    <entity index="2060" value="3"/>
+    <entity index="2061" value="3"/>
+    <entity index="2062" value="3"/>
+    <entity index="2063" value="3"/>
+    <entity index="2064" value="3"/>
+    <entity index="2065" value="3"/>
+    <entity index="2066" value="3"/>
+    <entity index="2067" value="3"/>
+    <entity index="2068" value="3"/>
+    <entity index="2069" value="3"/>
+    <entity index="2070" value="3"/>
+    <entity index="2071" value="3"/>
+    <entity index="2072" value="3"/>
+    <entity index="2073" value="3"/>
+    <entity index="2074" value="3"/>
+    <entity index="2075" value="3"/>
+    <entity index="2076" value="3"/>
+    <entity index="2077" value="3"/>
     <entity index="2078" value="3"/>
     <entity index="2079" value="3"/>
     <entity index="2080" value="3"/>
@@ -17545,36 +17545,36 @@
     <entity index="17541" value="3"/>
     <entity index="17542" value="3"/>
     <entity index="17543" value="3"/>
-    <entity index="17544" value="3"/>
-    <entity index="17545" value="3"/>
-    <entity index="17546" value="3"/>
-    <entity index="17547" value="3"/>
-    <entity index="17548" value="3"/>
-    <entity index="17549" value="3"/>
-    <entity index="17550" value="3"/>
-    <entity index="17551" value="3"/>
-    <entity index="17552" value="3"/>
-    <entity index="17553" value="3"/>
-    <entity index="17554" value="3"/>
-    <entity index="17555" value="3"/>
-    <entity index="17556" value="3"/>
-    <entity index="17557" value="3"/>
-    <entity index="17558" value="3"/>
-    <entity index="17559" value="3"/>
-    <entity index="17560" value="3"/>
-    <entity index="17561" value="3"/>
-    <entity index="17562" value="3"/>
-    <entity index="17563" value="3"/>
-    <entity index="17564" value="3"/>
-    <entity index="17565" value="3"/>
-    <entity index="17566" value="3"/>
-    <entity index="17567" value="3"/>
-    <entity index="17568" value="3"/>
-    <entity index="17569" value="3"/>
-    <entity index="17570" value="3"/>
-    <entity index="17571" value="3"/>
-    <entity index="17572" value="3"/>
-    <entity index="17573" value="3"/>
+    <entity index="17544" value="2"/>
+    <entity index="17545" value="2"/>
+    <entity index="17546" value="2"/>
+    <entity index="17547" value="2"/>
+    <entity index="17548" value="2"/>
+    <entity index="17549" value="2"/>
+    <entity index="17550" value="2"/>
+    <entity index="17551" value="2"/>
+    <entity index="17552" value="2"/>
+    <entity index="17553" value="2"/>
+    <entity index="17554" value="2"/>
+    <entity index="17555" value="2"/>
+    <entity index="17556" value="2"/>
+    <entity index="17557" value="2"/>
+    <entity index="17558" value="2"/>
+    <entity index="17559" value="2"/>
+    <entity index="17560" value="2"/>
+    <entity index="17561" value="2"/>
+    <entity index="17562" value="2"/>
+    <entity index="17563" value="2"/>
+    <entity index="17564" value="2"/>
+    <entity index="17565" value="2"/>
+    <entity index="17566" value="2"/>
+    <entity index="17567" value="2"/>
+    <entity index="17568" value="2"/>
+    <entity index="17569" value="2"/>
+    <entity index="17570" value="2"/>
+    <entity index="17571" value="2"/>
+    <entity index="17572" value="2"/>
+    <entity index="17573" value="2"/>
     <entity index="17574" value="2"/>
     <entity index="17575" value="2"/>
     <entity index="17576" value="2"/>
@@ -44863,91 +44863,5 @@
     <entity index="44859" value="2"/>
     <entity index="44860" value="2"/>
     <entity index="44861" value="2"/>
-    <entity index="44862" value="2"/>
-    <entity index="44863" value="2"/>
-    <entity index="44864" value="2"/>
-    <entity index="44865" value="2"/>
-    <entity index="44866" value="2"/>
-    <entity index="44867" value="2"/>
-    <entity index="44868" value="2"/>
-    <entity index="44869" value="2"/>
-    <entity index="44870" value="2"/>
-    <entity index="44871" value="2"/>
-    <entity index="44872" value="2"/>
-    <entity index="44873" value="2"/>
-    <entity index="44874" value="2"/>
-    <entity index="44875" value="2"/>
-    <entity index="44876" value="2"/>
-    <entity index="44877" value="2"/>
-    <entity index="44878" value="2"/>
-    <entity index="44879" value="2"/>
-    <entity index="44880" value="2"/>
-    <entity index="44881" value="2"/>
-    <entity index="44882" value="2"/>
-    <entity index="44883" value="2"/>
-    <entity index="44884" value="2"/>
-    <entity index="44885" value="2"/>
-    <entity index="44886" value="2"/>
-    <entity index="44887" value="2"/>
-    <entity index="44888" value="2"/>
-    <entity index="44889" value="2"/>
-    <entity index="44890" value="2"/>
-    <entity index="44891" value="2"/>
-    <entity index="44892" value="2"/>
-    <entity index="44893" value="2"/>
-    <entity index="44894" value="2"/>
-    <entity index="44895" value="2"/>
-    <entity index="44896" value="2"/>
-    <entity index="44897" value="2"/>
-    <entity index="44898" value="2"/>
-    <entity index="44899" value="2"/>
-    <entity index="44900" value="2"/>
-    <entity index="44901" value="2"/>
-    <entity index="44902" value="2"/>
-    <entity index="44903" value="2"/>
-    <entity index="44904" value="2"/>
-    <entity index="44905" value="2"/>
-    <entity index="44906" value="2"/>
-    <entity index="44907" value="2"/>
-    <entity index="44908" value="2"/>
-    <entity index="44909" value="2"/>
-    <entity index="44910" value="2"/>
-    <entity index="44911" value="2"/>
-    <entity index="44912" value="2"/>
-    <entity index="44913" value="2"/>
-    <entity index="44914" value="2"/>
-    <entity index="44915" value="2"/>
-    <entity index="44916" value="2"/>
-    <entity index="44917" value="2"/>
-    <entity index="44918" value="2"/>
-    <entity index="44919" value="2"/>
-    <entity index="44920" value="2"/>
-    <entity index="44921" value="2"/>
-    <entity index="44922" value="2"/>
-    <entity index="44923" value="2"/>
-    <entity index="44924" value="2"/>
-    <entity index="44925" value="2"/>
-    <entity index="44926" value="2"/>
-    <entity index="44927" value="2"/>
-    <entity index="44928" value="2"/>
-    <entity index="44929" value="2"/>
-    <entity index="44930" value="2"/>
-    <entity index="44931" value="2"/>
-    <entity index="44932" value="2"/>
-    <entity index="44933" value="2"/>
-    <entity index="44934" value="2"/>
-    <entity index="44935" value="2"/>
-    <entity index="44936" value="2"/>
-    <entity index="44937" value="2"/>
-    <entity index="44938" value="2"/>
-    <entity index="44939" value="2"/>
-    <entity index="44940" value="2"/>
-    <entity index="44941" value="2"/>
-    <entity index="44942" value="2"/>
-    <entity index="44943" value="2"/>
-    <entity index="44944" value="2"/>
-    <entity index="44945" value="2"/>
-    <entity index="44946" value="2"/>
-    <entity index="44947" value="2"/>
   </mesh_function>
 </dolfin>

@@ -65,6 +65,31 @@ class RingDipole(Expression):
             values[0]=0.0
 
 
+class RingQuadrupole(Expression):
+    def __init__(self,a,eps,xd,yd):
+        self.a_=a
+        self.eps_=eps
+        self.xd_=xd
+        self.yd_=yd
+        
+    def eval(self,values,x):
+        r=((x[0]-self.xd_)**2+(x[1]-self.yd_)**2)**0.5
+        cos2Phi=((x[0]-self.xd_)**2-(x[1]-self.yd_)**2)/r**2
+        sin2Phi=(x[1]-self.yd_)/r###do
+        Quad=(x[0]-self.xd_)**2-(x[1]-self.yd_)**2
+        if (r>self.a_-self.eps_ and r<self.a_+self.eps_):
+            if horizontal:
+                values[0]=Quad
+                #values[0]=cos2Phi+sin2Phi
+                #if (r<self.a_):
+                #    values[0]=(r-self.a_+self.eps_)*cosPhi
+                #else:
+                #    values[0]=(r-self.a_+self.eps_)*cosPhi 
+            else:
+                values[0]=0.0 #Implement skew quad
+        else:
+            values[0]=0.0
+
 
 """
 ###########################################################
@@ -133,3 +158,26 @@ def ExCurrentShiftedDipole(mesh,subdomains,q,a,eps,xd,yd):
     #######################################
     
     return Source/DipolemomentTEST
+
+
+def ExCurrentShiftedQuadrupole(mesh,subdomains,q,a,eps,xd,yd):
+    Source=RingQuadrupole(a,eps,xd,yd)
+
+   
+    #DipEx=Expression('x[0]-xd',xd=xd)
+
+    QuadTest=Expression('(x[0]-xd)*(x[0]-xd)-(x[1]-yd)*(x[1]-yd)',xd=xd, yd=yd)
+
+    
+    #######################################
+    #calculate proper dipole moment for normalzation
+    Vquad=FunctionSpace(mesh,'CG',1)
+
+    #DipExFunction=project(Source,Vdip)
+    #Dipolemoment=assemble(DipExFunction*DipTest*dx)
+    QuadTestFunction=project(Source,Vquad)
+    QuadrupolemomentTEST=assemble(QuadTestFunction*QuadTest*dx)
+    print("Quadrupole Moment: " , QuadrupolemomentTEST)
+    #######################################
+    
+    return Source/QuadrupolemomentTEST

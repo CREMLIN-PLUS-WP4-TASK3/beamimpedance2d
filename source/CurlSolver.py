@@ -6,7 +6,7 @@ by Uwe Niedermayer 2014
 
 
 from dolfin import *
-
+import numpy as np
 ###################################################################
 #operators
     
@@ -134,11 +134,33 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
          
   
     if SIBC:
-        delta=(2.0/(omega*mu0*kappa_s))**0.5
-        kr=-1.0/delta
-        ki=-1.0/delta
+        if twolayer:
+            d1=0.00008
+            kappa1=6e9
+            kappa2=1.8e8
+            mu1=mu0
+            mu2=mu0
+            delta1=(2.0/(omega*mu1*kappa1))**0.5
+            kz1=(1-1j)/delta1
+            R=(mu1*kappa2/(mu2*kappa1))**0.5
+            M=1+R
+            N=1-R
+            Zs=(1+1j)/(kappa1*delta1)*(M*np.exp(1j*kz1*d1)+N*np.exp(-1j*kz1*d1))/(M*np.exp(1j*kz1*d1)-N*np.exp(-1j*kz1*d1))
+            Ys=1.0/Zs
+            Yr=Ys.real
+            Yi=Ys.imag
+            print ("Yr: ", Yr )
+            print ("Yi: ", Yi )
+            kr=omega*mu0*Yi
+            ki=-omega*mu0*Yr
+        else:
+            delta=(2.0/(omega*mu0*kappa_s))**0.5
+            kr=-1.0/delta
+            ki=-1.0/delta
+            
         print ds
         print ("kr: ", kr )
+        print ("ki: ", ki )
         def t():
             #n = -FacetNormal(mesh)
             return as_vector((-n[1],n[0]))

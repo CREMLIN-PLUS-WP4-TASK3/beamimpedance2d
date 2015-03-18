@@ -29,7 +29,7 @@ __builtin__.div_order=1
 
 
 ###Result folder
-__builtin__.resultfolder="./results/"
+__builtin__.resultfolder="./FCCresults/"
 try:
     os.system('mkdir '+ resultfolder)
 except:
@@ -39,13 +39,14 @@ except:
 __builtin__.logscale=True     #log or lin frequency stepping
 __builtin__.dispersive=False  #Only for dispersive material update is required, set false if nondispersive-->faster
 __builtin__.plot3Dflag=False  #Make all 3D plots (use only for one frequency point)
+__builtin__.quadrupole=False       #Quadrupole transverse impedance (very preliminary!!!)
 __builtin__.dipole=True       #Dipole transverse impedance
 __builtin__.horizontal=True     # Only relevant for dipole=True
-__builtin__.dataexport=False    # Write (Overwrite) file in the result folder
+__builtin__.dataexport=True # Write (Overwrite) file in the result folder
 __builtin__.wallcurrent=False    #compute and export wall current
-__builtin__.SIBC=True           # Use surface impedance boundary condition. Set conductivity in Curlsolver.py.
-__builtin__.kappa_s=1e6         # Wall conductivity for surface impedance
-
+__builtin__.SIBC=True           # Use surface impedance boundary condition. 
+__builtin__.kappa_s=6e9 #cold copper         # Wall conductivity for single layer surface impedance
+__builtin__.twolayer=False   
 
 
 

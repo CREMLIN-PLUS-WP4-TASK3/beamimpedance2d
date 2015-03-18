@@ -117,10 +117,10 @@ def MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferr
             nurF.vector()[cell_number]=Ferrite.Nur
             nuiF.vector()[cell_number]=Ferrite.Nui
         if subdomain_no==6:
-            epsilonF.vector()[cell_number]=Grounding.Eps
-            kappaF.vector()[cell_number]=Grounding.Kappa
-            nurF.vector()[cell_number]=Grounding.Nur
-            nuiF.vector()[cell_number]=Grounding.Nui    
+            epsilonF.vector()[cell_number]=Titanium.Eps
+            kappaF.vector()[cell_number]=Titanium.Kappa
+            nurF.vector()[cell_number]=Titanium.Nur
+            nuiF.vector()[cell_number]=Titanium.Nui    
         if subdomain_no==7:
             epsilonF.vector()[cell_number]=Dielectric.Eps
             kappaF.vector()[cell_number]=Dielectric.Kappa

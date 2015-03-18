@@ -1,6 +1,6 @@
 lveryfine=8e-4;  //4e-4
-lfine = 5e-4;
-lrough = 4e-4;
+lfine = 1e-3;
+lrough = 4e-3;
 
 a=0.01;
 bx=0.073;

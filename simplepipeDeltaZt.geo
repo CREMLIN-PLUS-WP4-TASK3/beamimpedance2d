@@ -1,6 +1,6 @@
-lveryfine=5e-4;
-lfine = 5e-4;
-lrough = 5e-4;
+lveryfine=1e-3;
+lfine = 1e-4;
+lrough = 1e-3;
 
 a=0.01;
 b=0.04;

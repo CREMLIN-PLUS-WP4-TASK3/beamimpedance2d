@@ -36,10 +36,17 @@ def Ztrans(Elr,Eli,Jszr,Jszi, omega, beta,xd,yd):
     else:
         DipTest=Expression('x[1]-yd',yd=yd)
     
+    QuadTest=Expression('(x[0]-xd)*(x[0]-xd)-(x[1]-yd)*(x[1]-yd)',xd=xd, yd=yd)
     #x=Expression('x[0]')
     DM=assemble(DipTest*Jzrfct*dx)
+    QM=1.0#assemble(QuadTest*Jzrfct*dx)
     print "DM: ", DM
-    Ztr=-beta*c0/(omega*DM**2) *(assemble(inner(Elr,Jzrfct)*dx)+0*assemble(inner(Eli,Jzifct)*dx) \
+    #print "QM: ", QM
+    if quadrupole:
+        Ztr=-beta*c0/(omega*QM**2) *(assemble(inner(Elr,Jzrfct)*dx)+0*assemble(inner(Eli,Jzifct)*dx) \
+                +I*(-0*assemble(inner(Elr,Jzifct)*dx)+assemble(inner(Eli,Jzrfct)*dx) ))
+    else:
+        Ztr=-beta*c0/(omega*DM**2) *(assemble(inner(Elr,Jzrfct)*dx)+0*assemble(inner(Eli,Jzifct)*dx) \
                 +I*(-0*assemble(inner(Elr,Jzifct)*dx)+assemble(inner(Eli,Jzrfct)*dx) ))
     #check me! I'm just the power loss integral!
     return Ztr
