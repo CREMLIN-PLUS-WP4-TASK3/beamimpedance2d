@@ -35,6 +35,10 @@ zero=Constant(0.0)
 
 #############################################################
 #Import mesh
+#MeshFileName='SIS100-TransferKickerVacGap'
+#MeshFileName='SIS100-TransferKicker'
+#MeshFileName='SIS100-EmergencyKickerVacGap'
+MeshFileName='SIS100-EmergencyKicker'
 #MeshFileName='EllipticPipeDeltaZt'
 #MeshFileName='simplepipeDeltaZt_S2'
 #MeshFileName='collimator_shifted'
@@ -45,7 +49,7 @@ zero=Constant(0.0)
 #MeshFileName='fcc'
 #MeshFileName='fccWithoutHole'
 #MeshFileName='fccSIBC'
-MeshFileName='fccWithoutHoleSIBC'
+#MeshFileName='fccWithoutHoleSIBC'
 #MeshFileName='ThinShellPipeGNDfine'
 ##MeshFileName='simplepipeZlspch'
 #MeshFileName='extrudepipe'
@@ -60,7 +64,7 @@ print ("Mesh imported and converted! File: " + MeshFileName )
 #Beam parameters (SI units)
 px=0.0  #x-position
 py=0.0  #y-position
-a=0.001  #beam radius
+a=0.005  #beam radius
 s_mesh=1e-6   #Parameter for delta function representation
 eps=s_mesh*0.1   #Apply Delta-function representation on little smaller epsilon (safety-factor)
 #length=0.0254
@@ -68,10 +72,11 @@ length=1.0
 
 gamma_in=50000.0
 #gamma_in=100.0
-beta=(1.0-1.0/gamma_in**2)**0.5
+#beta=(1.0-1.0/gamma_in**2)**0.5
+
 #beta=0.947485301 #2GeV protons
 #beta=0.9999999 #roughly 7TeV
-#beta=0.1
+beta=0.9
 
 gamma=1/sqrt(1-beta**2)
 bgsinv= 1.0/(beta**2 *gamma**2) # 1/(beta^2gamma^2)
@@ -100,9 +105,9 @@ g_ana=0.25+ln(b/a) #longitudinal space charge impedance geometry factor
 
 ###############################################################
 #Frequency stepping
-maxfpoints=50 #Number of frequency points to compute
+maxfpoints=31 #Number of frequency points to compute
 #logscale
-startfexp=7.1
+startfexp=5.0
 pointsperdecade=10.0
 #linear scale
 startf=5e9
@@ -240,7 +245,7 @@ else:
 BeamMaterial=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,0.0)
 VacuumMaterial=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,0.0)
 Steel=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,1.4e8)
-Copper=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,6.0e9) #Equivalent kappa
+Copper=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,5.8e7) #Equivalent kappa
 Titanium=Material.MaterialProperties(1.0*nu0,0.0,1.0*eps0,1.8e8) #1e-6
 Dielectric=Material.MaterialProperties(1.0*nu0,0.0,100.0*eps0,0.0)
     
@@ -293,7 +298,7 @@ for fpointiter in range(maxfpoints):
         print ("nur:", nurFvalue)
         print ("nui:", nuiFvalue)
         Ferrite.reluctivityUpdate(nurFvalue*nu0,nuiFvalue*nu0)
-        [nur,nui,epsilon,kappa]= MeshGenerator.MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferrite,Grounding,Dielectric)
+        [nur,nui,epsilon,kappa]= MeshGenerator.MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferrite,Titanium,Dielectric)
         #plot(nui,mesh=mesh,interactive=True)
         #print nui.vector().array()
         print ('New material parameters imprinted on mesh')

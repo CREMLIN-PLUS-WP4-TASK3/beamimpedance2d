@@ -67,7 +67,8 @@ def PlotZlong(f,Zlong,Zlongloss,Zsc_ana):
     
     RElog=fig.add_subplot(221)
     try:
-        pylab.loglog(f,numpy.fabs(numpy.asarray(Zlong).real),f,numpy.fabs(numpy.asarray(Zlongloss).real), linewidth=4 )
+        pylab.loglog(f,numpy.fabs(numpy.asarray(Zlong).real),linewidth=4 )
+        pylab.loglog(f,numpy.fabs(numpy.asarray(Zlongloss).real), linewidth=4 ,linestyle='--')
     except:
         print ("Zero loglogplot")
         #pylab.axhline(y=R_Ohm, color='k')

@@ -26,7 +26,7 @@ def MeshImport(file):
 
 #################################################
 # Materials are converted into constants on the mesh triangles, i.e. projected on the zeroth order Discontinuous Galerkin basis
-def MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferrite,Grounding,Dielectric):
+def MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferrite,Titanium,Dielectric):
     print("Imprintintg Material properties on mesh, i.e. generating DG-0 functions")
     
 

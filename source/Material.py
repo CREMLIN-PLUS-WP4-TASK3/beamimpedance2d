@@ -27,7 +27,7 @@ class MaterialProperties(object):
 ## Read dispersion data list
 def PermeabilityRead():
     try:
-        infilename = "mischung43.dat";  
+        infilename = FerriteDataFile 
         ifile = open( infilename, 'r')  # open file for reading
     except:
         print ("File not found or cannot be opened!")    
