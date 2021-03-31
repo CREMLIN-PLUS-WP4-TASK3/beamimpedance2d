@@ -124,10 +124,10 @@ def ExCurrent(mesh,subdomains,q,a):
 def ExCurrentShifted(mesh,subdomains,q,a,xd,yd):
     limit=1e6
     #Jz=Expression('q/(pi*a*a)*   (1.0/pi *atan(limit*(a-sqrt(pow(x[0]-xd,2.0)+pow(x[1]-yd,2.0) ))) +0.5)  ' , q=q, limit=limit,a=a,xd=xd,yd=yd)    #normalized current desity
-    Jz=Expression('1.0/pi *atan(limit*(a-sqrt(pow(x[0]-xd,2.0)+pow(x[1]-yd,2.0) ))) +0.5  ' , q=q, limit=limit,a=a,xd=xd,yd=yd)    #uniform current desity
+    Jz=Expression('1.0/pi *atan(limit*(a-sqrt(pow(x[0]-xd,2.0)+pow(x[1]-yd,2.0) ))) +0.5  ' , q=q, limit=limit,a=a,xd=xd,yd=yd,degree=2)    #uniform current desity
     #######################################
     #calculate proper area for normalzation
-    VArea=FunctionSpace(mesh,'DG',0)
+    VArea=FunctionSpace(mesh,'Discontinuous Lagrange',0)
     AreaFunction=project(Jz,VArea)
     Area=assemble(AreaFunction*dx)
     print ("Excurrentshifted Area: ", Area)

@@ -60,8 +60,8 @@ def PermeabilityRead():
 def ReluctivityInterpolate(fd,fArray,murArray,muiArray):
     #fd=f[0]#desired f   NOOO!
     print ('Interpolating permemeability for f= ', fd, 'Hz')
-    #print 'Length of fArray', len(fArray)
-    #print fArray
+    #print ('Length of fArray', len(fArray))
+    #print (fArray)
     mur=0
     mui=0
     nur=0
@@ -72,18 +72,18 @@ def ReluctivityInterpolate(fd,fArray,murArray,muiArray):
     while notfound:  
         fc=fArray[n]        #current f
         fn= fArray[n+1]     #next f
-        #print fc, ' ' , fd, ' ' ,fn
+        #print (fc, ' ' , fd, ' ' ,fn)
         if fc <=fd and fd<= fn:
             mur=murArray[n]+(murArray[n+1]-murArray[n])/(fn-fc) *(fd-fc)
             mui=muiArray[n]+(muiArray[n+1]-muiArray[n])/(fn-fc) *(fd-fc)
             notfound=False
-            #print 'great success!'
+            #print ('great success!')
         
         n=n+1
             
         if n>len(fArray)-2:
             notfound=False
-            print ("Problem with frequency range")
+            raise ValueError("Problem with frequency range")
             
     print ('mu= ', mur, ' -i ',mui)
     
@@ -105,10 +105,10 @@ def MaterialTest():
     nui=[]
     f2Ar=[]
 
-    print len(fArray)
+    print (len(fArray))
 
     for n in range(len(fArray)-10):
-        print n
+        print (n)
         f2Ar.append(fArray[n]*1.1) 
         [nurttt,nuittt]=ReluctivityInterpolate(f2Ar[n],fArray,murArray,muiArray)
         nur.append(nurttt)

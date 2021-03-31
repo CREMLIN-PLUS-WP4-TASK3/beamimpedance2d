@@ -51,7 +51,7 @@ def ZAmat(scal,omega,beta):
 
 ###################################################################
 def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSvr,RHSvi):
-    domains = CellFunction("size_t", mesh)
+    domains = MeshFunction("size_t", mesh, 0)
     domains.set_all(0)
     dx = Measure("dx")[domains]
    
@@ -63,7 +63,7 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
     
     AdmittanceBoundaryObject=AdmittanceBoundary()
     
-    Abdy = FacetFunction("size_t", mesh)
+    Abdy = MeshFunction("size_t", mesh, 1)
     Abdy.set_all(0)
    
     AdmittanceBoundaryObject.mark(Abdy,0)
@@ -158,7 +158,7 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
             kr=-1.0/delta
             ki=-1.0/delta
             
-        print ds
+        print (ds)
         print ("kr: ", kr )
         print ("ki: ", ki )
         def t():

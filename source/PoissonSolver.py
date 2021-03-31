@@ -6,8 +6,9 @@ by Uwe Niedermayer 2014
 
 from dolfin import *
 def CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
+    H1_ = FiniteElement("CG",mesh.ufl_cell(), div_long_order)    #Space for the Potential
     H1 = FunctionSpace(mesh, "CG",div_long_order)    #Space for the Potential
-    Mix=H1*H1
+    Mix=FunctionSpace(mesh, H1_*H1_)
     
     (ur,ui) = TrialFunctions(Mix)
     (vr,vi) = TestFunctions(Mix)
@@ -31,17 +32,17 @@ def CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
     eq= ar+ai +br+bi==RHSr+RHSi
     
     
-    Zero = Expression(('0.0','0.0'))
+    Zero = Expression(('0.0','0.0'), degree=2)
     def u0_boundary(x, on_boundary):    # returns boolean if x on boundary
         return on_boundary
 
     BC=DirichletBC(Mix, Zero, u0_boundary)
     
     
-    set_log_level(PROGRESS)
-    solve(eq, Phi,BC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
-    #solve(eq, Phi,BC,solver_parameters={"linear_solver": "gmres","preconditioner": "sor"})
-    #solve(eq, Phi,BC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
+    # set_log_level(PROGRESS)
+    # solve(eq, Phi,BC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
+    # solve(eq, Phi,BC,solver_parameters={"linear_solver": "gmres","preconditioner": "sor"})
+    solve(eq, Phi,BC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
     (Phir,Phii)=Phi.split(deepcopy=False) 
     
     if(plot3Dflag):

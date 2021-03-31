@@ -40,8 +40,8 @@ def Ztrans(Elr,Eli,Jszr,Jszi, omega, beta,xd,yd):
     #x=Expression('x[0]')
     DM=assemble(DipTest*Jzrfct*dx)
     QM=1.0#assemble(QuadTest*Jzrfct*dx)
-    print "DM: ", DM
-    #print "QM: ", QM
+    print ("DM: ", DM)
+    #print ("QM: ", QM)
     if quadrupole:
         Ztr=-beta*c0/(omega*QM**2) *(assemble(inner(Elr,Jzrfct)*dx)+0*assemble(inner(Eli,Jzifct)*dx) \
                 +I*(-0*assemble(inner(Elr,Jzifct)*dx)+assemble(inner(Eli,Jzrfct)*dx) ))
@@ -405,21 +405,21 @@ def n_div(ftr_,fti_,flr_,fli_,omega,beta,mesh,tspace):
     
     ncomplex=((nHdivr**2+nHdivi**2)/(nL2r**2+nL2i**2))
     
-    print
-    print "ncomplex: ", ncomplex
-    print
+    print ()
+    print ("ncomplex: ", ncomplex)
+    print ()
     if (nr>0.01 or ni>0.01):
-        print "||Real_perp||_Hdiv0 : ", ndivr
-        print "||Imag_perp||_Hdiv0 : ", ndivi 
-        print "||Real||_Hdiv0 : ", nHdivr
-        print "||Imag||_Hdiv0 : ", nHdivi 
-        print "||Real||_L2: ", nL2r
-        print "||Imag||_L2: ", nL2i
-        print "nr: ",nr
-        print "ni: ",ni
+        print( "||Real_perp||_Hdiv0 : ", ndivr)
+        print( "||Imag_perp||_Hdiv0 : ", ndivi )
+        print( "||Real||_Hdiv0 : ", nHdivr)
+        print( "||Imag||_Hdiv0 : ", nHdivi )
+        print( "||Real||_L2: ", nL2r)
+        print( "||Imag||_L2: ", nL2i)
+        print( "nr: ",nr)
+        print( "ni: ",ni)
         print
     else:
-        print "Div Norm is nice and small!"
+        print( "Div Norm is nice and small!")
     
     return [nr,ni]
     
