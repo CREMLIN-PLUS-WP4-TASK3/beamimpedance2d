@@ -73,13 +73,13 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
     #plot(n,mesh=mesh)
     ################################################################
 
-    Vtr_ = FiniteElement("Nedelec 1st kind H(curl)", mesh.ufl_cell(), curl_order)
+    Vtr_ = VectorElement("Nedelec 1st kind H(curl)", mesh.ufl_cell(), curl_order)
     Vlr_ = FiniteElement("Lagrange", mesh.ufl_cell(), curl_long_order)
-    Vtr = FunctionSpace(mesh, "Nedelec 1st kind H(curl)", curl_order)
-    Vlr = FunctionSpace(mesh, "Lagrange", curl_long_order)
+    # Vtr = FunctionSpace(mesh, "Nedelec 1st kind H(curl)", curl_order)
+    # Vlr = FunctionSpace(mesh, "Lagrange", curl_long_order)
 
-    Vli=Vlr
-    Vti=Vtr
+    # Vli=Vlr
+    # Vti=Vtr
     Vli_=Vlr_
     Vti_=Vtr_
 
@@ -207,7 +207,7 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
     else:
         # solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
         solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
-        #solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "gmres","preconditioner": "sor"})
+        # solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "gmres","preconditioner": "sor"})
     print("solver done")
     #################
 
@@ -237,12 +237,19 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
 
 ###################################################################
 def CurlCurl(mesh,omega, beta, epsilon, kappa, nu, RHSsr, RHSsi, RHSvr,RHSvi):
-    Vtr = FunctionSpace(mesh, "Nedelec 1st kind H(curl)", curl_order)
-    Vlr = FunctionSpace(mesh, "CG", curl_long_order)
+    Vtr_ = FiniteElement("Nedelec 1st kind H(curl)", mesh.ufl_cell(), curl_order)
+    Vlr_ = FiniteElement("Lagrange", mesh.ufl_cell(), curl_long_order)
+    # Vtr = FunctionSpace(mesh, "Nedelec 1st kind H(curl)", curl_order)
+    # Vlr = FunctionSpace(mesh, "CG", curl_long_order)
 
-    Vli=Vlr
-    Vti=Vtr
-    V= MixedFunctionSpace([Vtr, Vti, Vlr, Vli])                            # 3D complex vector space
+    # Vli=Vlr
+    # Vti=Vtr
+    Vli_=Vlr_
+    Vti_=Vtr_
+
+    V_ = MixedElement([Vtr_, Vti_, Vlr_, Vli_])
+
+    V= FunctionSpace(mesh, V_)                            # 3D complex vector space
 
     (uvr,uvi,usr,usi) = TrialFunctions(V)
     (vvr,vvi,vsr,vsi) = TestFunctions(V)
@@ -273,7 +280,7 @@ def CurlCurl(mesh,omega, beta, epsilon, kappa, nu, RHSsr, RHSsi, RHSvr,RHSvi):
 
 
     ##################################################################################
-    Zero = Expression(('0','0','0','0','0','0'))
+    Zero = Expression(('0','0','0','0','0','0'), degree=6)
 
     def u0_boundary(x, on_boundary):    # returns boolean if x on boundary
         return on_boundary
@@ -282,7 +289,7 @@ def CurlCurl(mesh,omega, beta, epsilon, kappa, nu, RHSsr, RHSsi, RHSvr,RHSvi):
     ####################################################################################
 
     ################
-    set_log_level(PROGRESS)
+    # set_log_level(PROGRESS)
     solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
     print("solver done")
     #################

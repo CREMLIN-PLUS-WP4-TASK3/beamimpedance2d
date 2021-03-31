@@ -223,15 +223,15 @@ f=numpy.zeros(maxfpoints)
 
 if dipole:
     ZscTr_ana=numpy.zeros(maxfpoints, dtype="complex")
-    ZscTr_ana_direct=numpy.zeros(maxfpoints)
-    ZscTr_ana_indirect=numpy.zeros(maxfpoints)
-    Ztrans_ind=numpy.zeros(maxfpoints)
-    Ztrans_full=numpy.zeros(maxfpoints)
+    ZscTr_ana_direct=numpy.zeros(maxfpoints, dtype="complex")
+    ZscTr_ana_indirect=numpy.zeros(maxfpoints, dtype="complex")
+    Ztrans_ind=numpy.zeros(maxfpoints, dtype="complex")
+    Ztrans_full=numpy.zeros(maxfpoints, dtype="complex")
 else:
     Zsc_ana=numpy.zeros(maxfpoints, dtype="complex")
-    Zlong=numpy.zeros(maxfpoints)
-    Zlongloss=numpy.zeros(maxfpoints)
-    TotalCurrent=numpy.zeros(maxfpoints)
+    Zlong=numpy.zeros(maxfpoints, dtype="complex")
+    Zlongloss=numpy.zeros(maxfpoints, dtype="complex")
+    TotalCurrent=numpy.zeros(maxfpoints, dtype="complex")
 
 ################################################################################################
 #initialize material
@@ -268,41 +268,41 @@ for fpointiter in range(maxfpoints):
     omega=2*pi*f[fpointiter]
     print ("fpointiter: ", fpointiter,"  f= ",f[fpointiter]/1e6,"MHz" )
 
-    # ###############################################################################
-    # #Analytical references
-    # if dipole:
-    #     if quadrupole:
-    #         ZscTr_ana_direct[fpointiter]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    #             scipy.special.iv(2,(omega*a)/(beta*gamma*c0))*scipy.special.kn(2,(omega*a)/(beta*gamma*c0))
-    #         ZscTr_ana_indirect[fpointiter]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    #             (scipy.special.iv(2,(omega*a)/(beta*gamma*c0)))**2 \
-    #             *scipy.special.kn(2,(omega*b)/(beta*gamma*c0))/scipy.special.iv(2,(omega*b)/(beta*gamma*c0))
-    #         ZscTr_ana[fpointiter]=ZscTr_ana_direct[fpointiter]+ZscTr_ana_indirect[fpointiter]
-    #     else:
-    #         ZscTr_ana_direct[fpointiter]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    #             scipy.special.iv(1,(omega*a)/(beta*gamma*c0))*scipy.special.kn(1,(omega*a)/(beta*gamma*c0))  #check me
-    #         ZscTr_ana_indirect[fpointiter]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    #             (scipy.special.iv(1,(omega*a)/(beta*gamma*c0)))**2 \
-    #             *scipy.special.kn(1,(omega*b)/(beta*gamma*c0))/scipy.special.iv(1,(omega*b)/(beta*gamma*c0))
-    #         ZscTr_ana[fpointiter]=ZscTr_ana_direct[fpointiter]+ZscTr_ana_indirect[fpointiter]
-    # else:
-    #     Zsc_ana[fpointiter]=-I*omega*mu0*bgsinv*g_ana/(2*pi)*length
-    #     #ZscTr_ana[fpointiter]=-I*bgsinv*(beta*c0*mu0)*(1.0/a**2-1.0/b**2) *length/(2*pi)  #MQS
-    # ################################################################################
+    # # ###############################################################################
+    # # #Analytical references
+    # # if dipole:
+    # #     if quadrupole:
+    # #         ZscTr_ana_direct[fpointiter]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+    # #             scipy.special.iv(2,(omega*a)/(beta*gamma*c0))*scipy.special.kn(2,(omega*a)/(beta*gamma*c0))
+    # #         ZscTr_ana_indirect[fpointiter]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+    # #             (scipy.special.iv(2,(omega*a)/(beta*gamma*c0)))**2 \
+    # #             *scipy.special.kn(2,(omega*b)/(beta*gamma*c0))/scipy.special.iv(2,(omega*b)/(beta*gamma*c0))
+    # #         ZscTr_ana[fpointiter]=ZscTr_ana_direct[fpointiter]+ZscTr_ana_indirect[fpointiter]
+    # #     else:
+    # #         ZscTr_ana_direct[fpointiter]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+    # #             scipy.special.iv(1,(omega*a)/(beta*gamma*c0))*scipy.special.kn(1,(omega*a)/(beta*gamma*c0))  #check me
+    # #         ZscTr_ana_indirect[fpointiter]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+    # #             (scipy.special.iv(1,(omega*a)/(beta*gamma*c0)))**2 \
+    # #             *scipy.special.kn(1,(omega*b)/(beta*gamma*c0))/scipy.special.iv(1,(omega*b)/(beta*gamma*c0))
+    # #         ZscTr_ana[fpointiter]=ZscTr_ana_direct[fpointiter]+ZscTr_ana_indirect[fpointiter]
+    # # else:
+    # #     Zsc_ana[fpointiter]=-I*omega*mu0*bgsinv*g_ana/(2*pi)*length
+    # #     #ZscTr_ana[fpointiter]=-I*bgsinv*(beta*c0*mu0)*(1.0/a**2-1.0/b**2) *length/(2*pi)  #MQS
+    # # ################################################################################
 
-    # ###################################################################################################
-    # #Determine frequency dependent material parameters, update, and then imprint again on the mesh
-    # if (dispersive):
-    #     [nurFvalue,nuiFvalue]=Material.ReluctivityInterpolate(f[fpointiter],fArray,murArray,muiArray)
-    #     epsFvalue=10
-    #     print ("nur:", nurFvalue)
-    #     print ("nui:", nuiFvalue)
-    #     Ferrite.reluctivityUpdate(nurFvalue*nu0,nuiFvalue*nu0)
-    #     [nur,nui,epsilon,kappa]= MeshGenerator.MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferrite,Titanium,Dielectric)
-    #     #plot(nui,mesh=mesh,interactive=True)
-    #     #print (nui.vector().array())
-    #     print ('New material parameters imprinted on mesh')
-    # ####################################################################################################
+    # # ###################################################################################################
+    # # #Determine frequency dependent material parameters, update, and then imprint again on the mesh
+    # # if (dispersive):
+    # #     [nurFvalue,nuiFvalue]=Material.ReluctivityInterpolate(f[fpointiter],fArray,murArray,muiArray)
+    # #     epsFvalue=10
+    # #     print ("nur:", nurFvalue)
+    # #     print ("nui:", nuiFvalue)
+    # #     Ferrite.reluctivityUpdate(nurFvalue*nu0,nuiFvalue*nu0)
+    # #     [nur,nui,epsilon,kappa]= MeshGenerator.MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferrite,Titanium,Dielectric)
+    # #     #plot(nui,mesh=mesh,interactive=True)
+    # #     #print (nui.vector().array())
+    # #     print ('New material parameters imprinted on mesh')
+    # # ####################################################################################################
 
 
 
@@ -361,119 +361,119 @@ for fpointiter in range(maxfpoints):
 
     ######
     #Run curlcurl solver
-    #[Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurl(mesh,omega, beta, epsilon, kappa, nur, RHSsr, RHSsi, RHSvr,RHSvi)
-    [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr/omega**2, RHSsi/omega**2, RHSvr/omega**2,RHSvi/omega**2)   #sign RHSvr
+    [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurl(mesh,omega, beta, epsilon, kappa, nur, RHSsr, RHSsi, RHSvr,RHSvi)
+    # [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr/omega**2, RHSsi/omega**2, RHSvr/omega**2,RHSvi/omega**2)   #sign RHSvr
     #Rescaling with omega brings LF stabilization???
     ######
 
-    # #######################################################
-    # #Check div norm of Ecurl
-    # #print
-    # #print ("Div-Norm of Ecurl")
-    # #PostProc.n_div(Ecurltr,Ecurlti,Ecurllr,Ecurlli,omega,beta,mesh,Vcurltr)
-    # #########################################################
+    #######################################################
+    #Check div norm of Ecurl
+    #print
+    #print ("Div-Norm of Ecurl")
+    #PostProc.n_div(Ecurltr,Ecurlti,Ecurllr,Ecurlli,omega,beta,mesh,Vcurltr)
+    #########################################################
 
 
-    # #These are both in H(curl)
-    # Etr=omega**2*Ecurltr+Edivtr
-    # Eti=omega**2*Ecurlti+Edivti
-    # Elr=omega**2*Ecurllr+Edivlr
-    # Eli=omega**2*Ecurlli+Edivli
-    # ######
-    # """
-    # filer = File("Edivtr.pvd")
-    # filer << Edivtr
-    # filei = File("Edivti.pvd")
-    # filei << Edivti
-    # print ("huhu")
-    # """
+    #These are both in H(curl)
+    Etr=omega**2*Ecurltr+Edivtr
+    Eti=omega**2*Ecurlti+Edivti
+    Elr=omega**2*Ecurllr+Edivlr
+    Eli=omega**2*Ecurlli+Edivli
+    ######
+    """
+    filer = File("Edivtr.pvd")
+    filer << Edivtr
+    filei = File("Edivti.pvd")
+    filei << Edivti
+    print ("huhu")
+    """
 
 
 
 
-    # ##################################################################################################
-    # #Calculate Impedance
-    # if dipole:
-    #     Ztrans_full[fpointiter]=length*PostProc.Ztrans(Elr, Eli, Jszr, Jszi, omega, beta, px,py)
-    #     if quadrupole:
-    #         Ztrans_ind[fpointiter]=a**2*Ztrans_full[fpointiter]-ZscTr_ana_direct[fpointiter] #test!
-    #     else:
-    #         Ztrans_ind[fpointiter]=Ztrans_full[fpointiter]-ZscTr_ana_direct[fpointiter] #test!
-    #     print
-    #     print ("Ztrans_full= " , Ztrans_full[fpointiter], " at ", omega/(2*pi),"Hz")
-    #     print ("Ztrans_indirect= " , Ztrans_ind[fpointiter], " at ", omega/(2*pi),"Hz")
-    #     print
-    # else:
-    #     Zlong[fpointiter]=length*PostProc.Zlong(Elr, Eli, Jszr, Jszi, q)
-    #     print
-    #     print ("Zlong= " , Zlong[fpointiter], " at ", omega/(2*pi),"Hz")
-    #     print
-    # ###################################################################################################
+    ##################################################################################################
+    #Calculate Impedance
+    if dipole:
+        Ztrans_full[fpointiter]=length*PostProc.Ztrans(Elr, Eli, Jszr, Jszi, omega, beta, px,py)
+        if quadrupole:
+            Ztrans_ind[fpointiter]=a**2*Ztrans_full[fpointiter]-ZscTr_ana_direct[fpointiter] #test!
+        else:
+            Ztrans_ind[fpointiter]=Ztrans_full[fpointiter]-ZscTr_ana_direct[fpointiter] #test!
+        print
+        print ("Ztrans_full= " , Ztrans_full[fpointiter], " at ", omega/(2*pi),"Hz")
+        print ("Ztrans_indirect= " , Ztrans_ind[fpointiter], " at ", omega/(2*pi),"Hz")
+        print
+    else:
+        Zlong[fpointiter]=length*PostProc.Zlong(Elr, Eli, Jszr, Jszi, q)
+        print
+        print ("Zlong= " , Zlong[fpointiter], " at ", omega/(2*pi),"Hz")
+        print
+    ###################################################################################################
 
-    # ############################################################
-    # #calculate conduction current
-    # if wallcurrent:
-    #     Jcondr=Elr*kappa
-    #     Jcondi=Eli*kappa
-    #     TotalCurrent[fpointiter]=assemble(Jcondr*dx)+I*assemble(Jcondi*dx)
-    #     print ('Totalcurrent: ', TotalCurrent[fpointiter])
-    #     Zlongloss[fpointiter]=(length/q**2)*(assemble(inner(Elr,Jcondr)*dx)+assemble(inner(Eli,Jcondi)*dx))
-    # ##############################################################
+    ############################################################
+    #calculate conduction current
+    if wallcurrent:
+        Jcondr=Elr*kappa
+        Jcondi=Eli*kappa
+        TotalCurrent[fpointiter]=assemble(Jcondr*dx)+I*assemble(Jcondi*dx)
+        print ('Totalcurrent: ', TotalCurrent[fpointiter])
+        Zlongloss[fpointiter]=(length/q**2)*(assemble(inner(Elr,Jcondr)*dx)+assemble(inner(Eli,Jcondi)*dx))
+    ##############################################################
 
 
-    # if(plot3Dflag):
-    #     plot(Etr,title='Etr')
-    #     plot(Eti,title='Eti')
-    #     plot(Elr,title='Elr')
-    #     plot(Eli,title='Eli')
-    #     interactive()
+    if(plot3Dflag):
+        plot(Etr,title='Etr')
+        plot(Eti,title='Eti')
+        plot(Elr,title='Elr')
+        plot(Eli,title='Eli')
+        interactive()
 
 #End of f-loop
 ###########################################################################
 
-# ##################################################################################################################
+##################################################################################################################
 
-# #############################################################
-# ##Export impedance
-# if dataexport:
-#     ExportName=MeshFileName+'beta'+str(beta)
-#     if dipole:
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_full.dat',f,Ztrans_full)
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_ind.dat',f,Ztrans_ind)
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_full.dat',f,ZscTr_ana)
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_ind.dat',f,ZscTr_ana_indirect)
-#     else:
-#         PostProc.CplxImpExport(ExportName+'Zl.dat',f,Zlong)
-#     if wallcurrent:
-#         PostProc.CplxImpExport(ExportName+'ZlLoss.dat',f,Zlongloss)
-#         PostProc.CplxImpExport(ExportName+'Current.dat',f,TotalCurrent)
+#############################################################
+##Export impedance
+if dataexport:
+    ExportName=MeshFileName+'beta'+str(beta)
+    if dipole:
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_full.dat',f,Ztrans_full)
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_ind.dat',f,Ztrans_ind)
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_full.dat',f,ZscTr_ana)
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_ind.dat',f,ZscTr_ana_indirect)
+    else:
+        PostProc.CplxImpExport(ExportName+'Zl.dat',f,Zlong)
+    if wallcurrent:
+        PostProc.CplxImpExport(ExportName+'ZlLoss.dat',f,Zlongloss)
+        PostProc.CplxImpExport(ExportName+'Current.dat',f,TotalCurrent)
 
-# #############################################################
-
-
-
-# #############################################################
-# #Plot impedance
-# if dipole:
-#     if quadrupole:
-#         PostProc.PlotZtrans(f,numpy.multiply(a**2,Ztrans_full),ZscTr_ana,'Full Transverse Impedance')
-#         #PostProc.PlotZtrans(f,Ztrans_full,numpy.multiply(1/(2*a**2),ZscTr_ana),'Full Transverse Impedance')
-#         PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
-#     else:
-#         #PostProc.PlotZtranslinear(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
-#         PostProc.PlotZtrans(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
-#         PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
-# else:
-#     if wallcurrent:
-#         PostProc.PlotZlong(f,Zlong,Zlongloss,Zsc_ana)
-#     else:
-#         PostProc.PlotZlong(f,Zlong,Zlong,Zsc_ana)
-# ##############################################################
+#############################################################
 
 
-# ################################################################################
-# #Plot Conduction current
-# if wallcurrent:
-#     PostProc.PlotWallCurrent(f,TotalCurrent)
-# ################################################################################
-# pylab.show()
+
+#############################################################
+#Plot impedance
+if dipole:
+    if quadrupole:
+        PostProc.PlotZtrans(f,numpy.multiply(a**2,Ztrans_full),ZscTr_ana,'Full Transverse Impedance')
+        #PostProc.PlotZtrans(f,Ztrans_full,numpy.multiply(1/(2*a**2),ZscTr_ana),'Full Transverse Impedance')
+        PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
+    else:
+        #PostProc.PlotZtranslinear(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
+        PostProc.PlotZtrans(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
+        PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
+else:
+    if wallcurrent:
+        PostProc.PlotZlong(f,Zlong,Zlongloss,Zsc_ana)
+    else:
+        PostProc.PlotZlong(f,Zlong,Zlong,Zsc_ana)
+##############################################################
+
+
+################################################################################
+#Plot Conduction current
+if wallcurrent:
+    PostProc.PlotWallCurrent(f,TotalCurrent)
+################################################################################
+pylab.show()
