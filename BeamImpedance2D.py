@@ -306,65 +306,65 @@ for fpointiter in range(maxfpoints):
 
 
 
-    # ####################################################################################################################
-    # ##Calculate Ediv
-    # [Phir,Phii]=PoissonSolver.CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi)
-    # Edivtr=project(-nabla_grad(Phir),Hcurl)
-    # Edivti=project(-nabla_grad(Phii),Hcurl)
-    # Edivlr= project(-omega/(beta *c0) *Phii,H1)
-    # Edivli= project(omega/(beta *c0) *Phir,H1)
-    # #Jdivlr= project(-omega/(beta *c0) *kappa*Phii,Vcurllr)
-    # #Jdivli= project(omega/(beta *c0) *kappa*Phir,Vcurllr)
-    # #Jdivtr=project(-kappa*nabla_grad(Phir),Vcurltr)
-    # #Jdivti=project(-kappa*nabla_grad(Phii),Vcurltr)
-    # ####################################################################################################################
-    # ####################################
-    # #Plot Ediv
-    # if(plot3Dflag):
-    #     plot(Edivtr,title='Edivtr',basename='Edivtr')
-    #     plot(Edivti,title='Edivti',basename='Edivti')
-    #     plot(Edivlr,title='Edivlr',basename='Edivlr')
-    #     plot(Edivli,title='Edivli',basename='Edivli')
-    #     interactive()
-    #     #plot(Jdivlr,'Jdivlr')
-    #     #plot(Jdivli,'Jdivli')
-    #     #plot(Jdivtr,'Jdivtr')
-    #     #plot(Jdivti,'Jdivti')
-    #     #interactive()
-    # ####################################
+    ####################################################################################################################
+    ##Calculate Ediv
+    [Phir,Phii]=PoissonSolver.CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi)
+    Edivtr=project(-nabla_grad(Phir),Hcurl)
+    Edivti=project(-nabla_grad(Phii),Hcurl)
+    Edivlr= project(-omega/(beta *c0) *Phii,H1)
+    Edivli= project(omega/(beta *c0) *Phir,H1)
+    #Jdivlr= project(-omega/(beta *c0) *kappa*Phii,Vcurllr)
+    #Jdivli= project(omega/(beta *c0) *kappa*Phir,Vcurllr)
+    #Jdivtr=project(-kappa*nabla_grad(Phir),Vcurltr)
+    #Jdivti=project(-kappa*nabla_grad(Phii),Vcurltr)
+    ####################################################################################################################
+    ####################################
+    #Plot Ediv
+    if(plot3Dflag):
+        plot(Edivtr,title='Edivtr',basename='Edivtr')
+        plot(Edivti,title='Edivti',basename='Edivti')
+        plot(Edivlr,title='Edivlr',basename='Edivlr')
+        plot(Edivli,title='Edivli',basename='Edivli')
+        interactive()
+        #plot(Jdivlr,'Jdivlr')
+        #plot(Jdivli,'Jdivli')
+        #plot(Jdivtr,'Jdivtr')
+        #plot(Jdivti,'Jdivti')
+        #interactive()
+    ####################################
 
 
 
-    # ####################################################################################################################
-    # #calculate RHS
-    # RHSvr=omega*omega*epsilon*Edivtr+omega*kappa*Edivti
-    # RHSvi=omega*omega*epsilon*Edivti-omega*kappa*Edivtr
-    # RHSsr=omega*omega*epsilon*Edivlr+omega*kappa*Edivli
-    # RHSsi=omega*omega*epsilon*Edivli+omega*kappa*Edivlr-omega*Jszr
-    # ####################################################################################################################
-    # ####################################
-    # #Plot RHS
-    # if(plot3Dflag):
-    #     plot(RHSvr,title='RHSvr')
-    #     plot(RHSvi,title='RHSvi')
-    #     plot(RHSsr,title='RHSsr')
-    #     plot(RHSsi,title='RHSsi')
-    #     interactive()
-    # ####################################
+    ####################################################################################################################
+    #calculate RHS
+    RHSvr=omega*omega*epsilon*Edivtr+omega*kappa*Edivti
+    RHSvi=omega*omega*epsilon*Edivti-omega*kappa*Edivtr
+    RHSsr=omega*omega*epsilon*Edivlr+omega*kappa*Edivli
+    RHSsi=omega*omega*epsilon*Edivli+omega*kappa*Edivlr-omega*Jszr
+    ####################################################################################################################
+    ####################################
+    #Plot RHS
+    if(plot3Dflag):
+        plot(RHSvr,title='RHSvr')
+        plot(RHSvi,title='RHSvi')
+        plot(RHSsr,title='RHSsr')
+        plot(RHSsi,title='RHSsi')
+        interactive()
+    ####################################
 
-    # #######################################################
-    # #Check div norm of RHS
-    # #print
-    # #print ("Div-Norm of RHS")
-    # #PostProc.n_div(RHSvr,RHSvi,HSsr,RHSsi,omega,beta,mesh,Vcurltr)
-    # #########################################################
+    #######################################################
+    #Check div norm of RHS
+    #print
+    #print ("Div-Norm of RHS")
+    #PostProc.n_div(RHSvr,RHSvi,HSsr,RHSsi,omega,beta,mesh,Vcurltr)
+    #########################################################
 
-    # ######
-    # #Run curlcurl solver
-    # #[Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurl(mesh,omega, beta, epsilon, kappa, nur, RHSsr, RHSsi, RHSvr,RHSvi)
-    # [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr/omega**2, RHSsi/omega**2, RHSvr/omega**2,RHSvi/omega**2)   #sign RHSvr
-    # #Rescaling with omega brings LF stabilization???
-    # ######
+    ######
+    #Run curlcurl solver
+    #[Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurl(mesh,omega, beta, epsilon, kappa, nur, RHSsr, RHSsi, RHSvr,RHSvi)
+    [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr/omega**2, RHSsi/omega**2, RHSvr/omega**2,RHSvi/omega**2)   #sign RHSvr
+    #Rescaling with omega brings LF stabilization???
+    ######
 
     # #######################################################
     # #Check div norm of Ecurl

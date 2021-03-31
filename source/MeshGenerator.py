@@ -83,7 +83,6 @@ def MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferr
         if subdomain_no==7:
             cell_markers6[cell]=True
 
-
     for cell_number in range(len(subdomains.array())):
         subdomain_no = subdomains.array()[cell_number]
         #print('subdomain_no cell_no',subdomain_no, cell_number)

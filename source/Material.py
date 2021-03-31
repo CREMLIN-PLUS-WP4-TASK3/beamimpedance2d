@@ -14,39 +14,39 @@ class MaterialProperties(object):
         self.Nui=nui
         self.Eps=epsilon
         self.Kappa=kappa
-        
+
     def reluctivityUpdate(self,nur,nui):
         print("old reluctivity: ", self.Nur, " +i ",self.Nui)
         self.Nur=nur
         self.Nui=nui
         print("new reluctivity: ", self.Nur, " +i ",self.Nui)
-        
+
 
 
 ###############################################
 ## Read dispersion data list
 def PermeabilityRead():
     try:
-        infilename = FerriteDataFile 
+        infilename = FerriteDataFile
         ifile = open( infilename, 'r')  # open file for reading
     except:
-        print ("File not found or cannot be opened!")    
-        
+        raise FileNotFoundError("File not found or cannot be opened!")
+
     murArray=[]
     muiArray=[]
     fArray=[]
-    
+
     re=0
     im=0
     fc=0
-        
+
     for line in ifile:
         linetuple = line.split()
         try:
             fc=float(linetuple[0])
             re=float(linetuple[1])
-            im=float(linetuple[2])   
-            fArray.append(fc) 
+            im=float(linetuple[2])
+            fArray.append(fc)
             murArray.append(re)
             muiArray.append(im)
         except:
@@ -68,8 +68,8 @@ def ReluctivityInterpolate(fd,fArray,murArray,muiArray):
     nui=0
     n=0
     notfound=True
-    
-    while notfound:  
+
+    while notfound:
         fc=fArray[n]        #current f
         fn= fArray[n+1]     #next f
         #print (fc, ' ' , fd, ' ' ,fn)
@@ -78,23 +78,23 @@ def ReluctivityInterpolate(fd,fArray,murArray,muiArray):
             mui=muiArray[n]+(muiArray[n+1]-muiArray[n])/(fn-fc) *(fd-fc)
             notfound=False
             #print ('great success!')
-        
+
         n=n+1
-            
+
         if n>len(fArray)-2:
             notfound=False
             raise ValueError("Problem with frequency range")
-            
+
     print ('mu= ', mur, ' -i ',mui)
-    
+
     if mur==0 and mui==0:
         print ("mu value not found!!!")
         mur=1
         mui=0
-    
+
     nur=mur/(mur**2 + mui**2)
     nui=mui/(mur**2 + mui**2)
-        
+
     return [nur,nui]
 ###################################################################################
 
@@ -109,7 +109,7 @@ def MaterialTest():
 
     for n in range(len(fArray)-10):
         print (n)
-        f2Ar.append(fArray[n]*1.1) 
+        f2Ar.append(fArray[n]*1.1)
         [nurttt,nuittt]=ReluctivityInterpolate(f2Ar[n],fArray,murArray,muiArray)
         nur.append(nurttt)
         nui.append(nuittt)
@@ -120,5 +120,3 @@ def MaterialTest():
     pylab.loglog(f2Ar,nur,f2Ar,nui)
     pylab.show()
     return
-
-
