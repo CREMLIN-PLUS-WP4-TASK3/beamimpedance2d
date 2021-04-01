@@ -143,7 +143,15 @@ cython_debug/
 
 # this project
 *.pdf
+*.jpg
+*.jpeg
 *.png
 *.ps
 *.vtu
 *.pvd
+*.dat
+*.msh
+*.xml
+*.geo
+*.geo.opt
+*.h
