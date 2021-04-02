@@ -111,7 +111,8 @@ g_ana=0.25+ln(b/a) #longitudinal space charge impedance geometry factor
 maxfpoints=1 #Number of frequency points to compute
 #logscale
 startfexp=3.0
-pointsperdecade=5.0
+stopfexp=5.0
+pointsperdecade=5
 #linear scale
 startf=5e9
 stopf=5e9
@@ -204,6 +205,9 @@ else:
 
 Jszi=zero
 
+fle = File('/tmp/out.pvd')
+fle << Jszr
+
 if plot3Dflag:
         viz=plot(Jszr, mesh=mesh,interactive=True,title='Jszr', basename='Jszr')
         #viz.write_png('Jszr.png')
@@ -220,7 +224,11 @@ rhoi=Jszi*1.0/(beta*c0)
 ##############################################################################################
 # Create frequency arrays
 # Note that omega is just a scalar for the current frequency point
-f=numpy.zeros(maxfpoints)
+if logscale:
+    f = numpy.logspace(startfexp, stopfexp, num=numpy.int(pointsperdecade*(stopfexp-startfexp)))
+else:
+    f = numpy.linspace(startf, stopf, num=maxfpoints)
+
 
 if dipole:
     ZscTr_ana=numpy.zeros(maxfpoints, dtype="complex")
@@ -257,17 +265,18 @@ Dielectric=Material.MaterialProperties(1.0*nu0,0.0,100.0*eps0,0.0)
 print ('Material initialized!')
 #################################################################################################
 
+# output_file = File('material_props.pvd')
+# output_file << nur
+# output_file << nui
+# output_file << epsilon
+# output_file << kappa
 
 
 #The big frequency loop
-for fpointiter in range(maxfpoints):
-    if logscale:
-        f[fpointiter]=10**(startfexp+fpointiter/pointsperdecade)
-    else:
-        f[fpointiter]=startf+fpointiter*(stopf-startf)/maxfpoints
+for i, fpoint in enumerate(f):
 
-    omega=2*pi*f[fpointiter]
-    print ("fpointiter: ", fpointiter,"  f= ",f[fpointiter]/1e6,"MHz" )
+    omega=2*pi*fpoint
+    print ("fpoint: ", fpoint,"  f= ",fpoint/1e6,"MHz" )
 
     # # ###############################################################################
     # # #Analytical references
@@ -314,10 +323,25 @@ for fpointiter in range(maxfpoints):
     Edivti=project(-nabla_grad(Phii),Hcurl)
     Edivlr= project(-omega/(beta *c0) *Phii,H1)
     Edivli= project(omega/(beta *c0) *Phir,H1)
-    #Jdivlr= project(-omega/(beta *c0) *kappa*Phii,Vcurllr)
-    #Jdivli= project(omega/(beta *c0) *kappa*Phir,Vcurllr)
-    #Jdivtr=project(-kappa*nabla_grad(Phir),Vcurltr)
-    #Jdivti=project(-kappa*nabla_grad(Phii),Vcurltr)
+
+    # output_file = File('Ediv.pvd')
+    # output_file << Edivtr
+    # output_file << Edivti
+    # output_file << Edivlr
+    # output_file << Edivli
+
+
+    # Jdivtr=project(-kappa*nabla_grad(Phir),Hcurl)
+    # Jdivti=project(-kappa*nabla_grad(Phii),Hcurl)
+    # Jdivlr= project(-omega/(beta *c0) *kappa*Phii,H1)
+    # Jdivli= project(omega/(beta *c0) *kappa*Phir,H1)
+
+    # output_file = File('Jdiv.pvd')
+    # output_file << Jdivtr
+    # output_file << Jdivti
+    # output_file << Jdivlr
+    # output_file << Jdivli
+
     ####################################################################################################################
     ####################################
     #Plot Ediv
@@ -334,8 +358,6 @@ for fpointiter in range(maxfpoints):
         #interactive()
     ####################################
 
-
-
     ####################################################################################################################
     #calculate RHS
     RHSvr=omega*omega*epsilon*Edivtr+omega*kappa*Edivti
@@ -351,14 +373,15 @@ for fpointiter in range(maxfpoints):
         plot(RHSsr,title='RHSsr')
         plot(RHSsi,title='RHSsi')
         interactive()
+
     ####################################
 
-    #######################################################
-    #Check div norm of RHS
-    #print
-    #print ("Div-Norm of RHS")
-    #PostProc.n_div(RHSvr,RHSvi,HSsr,RHSsi,omega,beta,mesh,Vcurltr)
-    #########################################################
+    # #######################################################
+    # #Check div norm of RHS
+    # #print
+    # #print ("Div-Norm of RHS")
+    # #PostProc.n_div(RHSvr,RHSvi,HSsr,RHSsi,omega,beta,mesh,Vcurltr)
+    # #########################################################
 
     ######
     #Run curlcurl solver
@@ -367,12 +390,19 @@ for fpointiter in range(maxfpoints):
     #Rescaling with omega brings LF stabilization???
     ######
 
-    #######################################################
-    #Check div norm of Ecurl
-    #print
-    #print ("Div-Norm of Ecurl")
-    #PostProc.n_div(Ecurltr,Ecurlti,Ecurllr,Ecurlli,omega,beta,mesh,Vcurltr)
-    #########################################################
+    output_file = File('CurlCurl.pvd')
+    output_file << Ecurllr
+    output_file << Ecurlli
+    output_file << Ecurltr
+    output_file << Ecurlti
+
+
+    # #######################################################
+    # #Check div norm of Ecurl
+    # #print
+    # #print ("Div-Norm of Ecurl")
+    # #PostProc.n_div(Ecurltr,Ecurlti,Ecurllr,Ecurlli,omega,beta,mesh,Vcurltr)
+    # #########################################################
 
 
     #These are both in H(curl)
@@ -395,86 +425,86 @@ for fpointiter in range(maxfpoints):
     ##################################################################################################
     #Calculate Impedance
     if dipole:
-        Ztrans_full[fpointiter]=length*PostProc.Ztrans(Elr, Eli, Jszr, Jszi, omega, beta, px,py)
+        Ztrans_full[i]=length*PostProc.Ztrans(Elr, Eli, Jszr, Jszi, omega, beta, px,py)
         if quadrupole:
-            Ztrans_ind[fpointiter]=a**2*Ztrans_full[fpointiter]-ZscTr_ana_direct[fpointiter] #test!
+            Ztrans_ind[i]=a**2*Ztrans_full[i]-ZscTr_ana_direct[i] #test!
         else:
-            Ztrans_ind[fpointiter]=Ztrans_full[fpointiter]-ZscTr_ana_direct[fpointiter] #test!
+            Ztrans_ind[i]=Ztrans_full[i]-ZscTr_ana_direct[i] #test!
         print
-        print ("Ztrans_full= " , Ztrans_full[fpointiter], " at ", omega/(2*pi),"Hz")
-        print ("Ztrans_indirect= " , Ztrans_ind[fpointiter], " at ", omega/(2*pi),"Hz")
+        print ("Ztrans_full= " , Ztrans_full[i], " at ", omega/(2*pi),"Hz")
+        print ("Ztrans_indirect= " , Ztrans_ind[i], " at ", omega/(2*pi),"Hz")
         print
     else:
-        Zlong[fpointiter]=length*PostProc.Zlong(Elr, Eli, Jszr, Jszi, q)
+        Zlong[i]=length*PostProc.Zlong(Elr, Eli, Jszr, Jszi, q)
         print
-        print ("Zlong= " , Zlong[fpointiter], " at ", omega/(2*pi),"Hz")
+        print ("Zlong= " , Zlong[i], " at ", omega/(2*pi),"Hz")
         print
     ###################################################################################################
 
-    ############################################################
-    #calculate conduction current
-    if wallcurrent:
-        Jcondr=Elr*kappa
-        Jcondi=Eli*kappa
-        TotalCurrent[fpointiter]=assemble(Jcondr*dx)+I*assemble(Jcondi*dx)
-        print ('Totalcurrent: ', TotalCurrent[fpointiter])
-        Zlongloss[fpointiter]=(length/q**2)*(assemble(inner(Elr,Jcondr)*dx)+assemble(inner(Eli,Jcondi)*dx))
-    ##############################################################
+#     ############################################################
+#     #calculate conduction current
+#     if wallcurrent:
+#         Jcondr=Elr*kappa
+#         Jcondi=Eli*kappa
+#         TotalCurrent[i]=assemble(Jcondr*dx)+I*assemble(Jcondi*dx)
+#         print ('Totalcurrent: ', TotalCurrent[i])
+#         Zlongloss[i]=(length/q**2)*(assemble(inner(Elr,Jcondr)*dx)+assemble(inner(Eli,Jcondi)*dx))
+#     ##############################################################
 
 
-    if(plot3Dflag):
-        plot(Etr,title='Etr')
-        plot(Eti,title='Eti')
-        plot(Elr,title='Elr')
-        plot(Eli,title='Eli')
-        interactive()
+#     if(plot3Dflag):
+#         plot(Etr,title='Etr')
+#         plot(Eti,title='Eti')
+#         plot(Elr,title='Elr')
+#         plot(Eli,title='Eli')
+#         interactive()
 
-#End of f-loop
-###########################################################################
+# #End of f-loop
+# ###########################################################################
 
-##################################################################################################################
+# ##################################################################################################################
 
-#############################################################
-##Export impedance
-if dataexport:
-    ExportName=MeshFileName+'beta'+str(beta)
-    if dipole:
-        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_full.dat',f,Ztrans_full)
-        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_ind.dat',f,Ztrans_ind)
-        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_full.dat',f,ZscTr_ana)
-        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_ind.dat',f,ZscTr_ana_indirect)
-    else:
-        PostProc.CplxImpExport(ExportName+'Zl.dat',f,Zlong)
-    if wallcurrent:
-        PostProc.CplxImpExport(ExportName+'ZlLoss.dat',f,Zlongloss)
-        PostProc.CplxImpExport(ExportName+'Current.dat',f,TotalCurrent)
+# #############################################################
+# ##Export impedance
+# if dataexport:
+#     ExportName=MeshFileName+'beta'+str(beta)
+#     if dipole:
+#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_full.dat',f,Ztrans_full)
+#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_ind.dat',f,Ztrans_ind)
+#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_full.dat',f,ZscTr_ana)
+#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_ind.dat',f,ZscTr_ana_indirect)
+#     else:
+#         PostProc.CplxImpExport(ExportName+'Zl.dat',f,Zlong)
+#     if wallcurrent:
+#         PostProc.CplxImpExport(ExportName+'ZlLoss.dat',f,Zlongloss)
+#         PostProc.CplxImpExport(ExportName+'Current.dat',f,TotalCurrent)
 
-#############################################################
-
-
-
-#############################################################
-#Plot impedance
-if dipole:
-    if quadrupole:
-        PostProc.PlotZtrans(f,numpy.multiply(a**2,Ztrans_full),ZscTr_ana,'Full Transverse Impedance')
-        #PostProc.PlotZtrans(f,Ztrans_full,numpy.multiply(1/(2*a**2),ZscTr_ana),'Full Transverse Impedance')
-        PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
-    else:
-        #PostProc.PlotZtranslinear(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
-        PostProc.PlotZtrans(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
-        PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
-else:
-    if wallcurrent:
-        PostProc.PlotZlong(f,Zlong,Zlongloss,Zsc_ana)
-    else:
-        PostProc.PlotZlong(f,Zlong,Zlong,Zsc_ana)
-##############################################################
+# #############################################################
 
 
-################################################################################
-#Plot Conduction current
-if wallcurrent:
-    PostProc.PlotWallCurrent(f,TotalCurrent)
-################################################################################
-pylab.show()
+
+# #############################################################
+# #Plot impedance
+# if dipole:
+#     if quadrupole:
+#         PostProc.PlotZtrans(f,numpy.multiply(a**2,Ztrans_full),ZscTr_ana,'Full Transverse Impedance')
+#         #PostProc.PlotZtrans(f,Ztrans_full,numpy.multiply(1/(2*a**2),ZscTr_ana),'Full Transverse Impedance')
+#         PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
+#     else:
+#         #PostProc.PlotZtranslinear(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
+#         PostProc.PlotZtrans(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
+#         PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
+# else:
+#     if wallcurrent:
+#         PostProc.PlotZlong(f,Zlong,Zlongloss,Zsc_ana)
+#     else:
+#         PostProc.PlotZlong(f,Zlong,Zlong,Zsc_ana)
+# ##############################################################
+
+
+# ################################################################################
+# #Plot Conduction current
+# if wallcurrent:
+#     PostProc.PlotWallCurrent(f,TotalCurrent)
+# ################################################################################
+# pylab.show()

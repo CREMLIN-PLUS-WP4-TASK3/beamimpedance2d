@@ -51,79 +51,42 @@ def MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferr
     nurF=Function(V0)
     nuiF=Function(V0)
 
-    cell_markers0 = MeshFunction("bool", mesh, mesh.topology().dim())    #beam
-    cell_markers1 = MeshFunction("bool", mesh, mesh.topology().dim())    #vacuum
-    cell_markers2 = MeshFunction("bool", mesh, mesh.topology().dim())    #Steel
-    cell_markers3 = MeshFunction("bool", mesh, mesh.topology().dim())    #Copper
-    cell_markers4 = MeshFunction("bool", mesh, mesh.topology().dim())    #Ferrite
-    cell_markers5 = MeshFunction("bool", mesh, mesh.topology().dim())    #Grounding
-    cell_markers6 = MeshFunction("bool", mesh, mesh.topology().dim())    #Dielectric
-    cell_markers0.set_all(False)
-    cell_markers1.set_all(False)
-    cell_markers2.set_all(False)
-    cell_markers3.set_all(False)
-    cell_markers4.set_all(False)
-    cell_markers5.set_all(False)
-    cell_markers6.set_all(False)
+    epsilonF.vector()[subdomains.where_equal(1)]=BeamMaterial.Eps
+    kappaF.vector()[subdomains.where_equal(1)]=BeamMaterial.Kappa
+    nurF.vector()[subdomains.where_equal(1)]=BeamMaterial.Nur
+    nuiF.vector()[subdomains.where_equal(1)]=BeamMaterial.Nui
 
-    for cell in range(len(subdomains.array())):
-        subdomain_no = subdomains.array()[cell]
-        if subdomain_no==1:
-            cell_markers0[cell]=True
-        if subdomain_no==2:
-            cell_markers1[cell]=True
-        if subdomain_no==3:
-            cell_markers2[cell]=True
-        if subdomain_no==4:
-            cell_markers3[cell]=True
-        if subdomain_no==5:
-            cell_markers4[cell]=True
-        if subdomain_no==6:
-            cell_markers5[cell]=True
-        if subdomain_no==7:
-            cell_markers6[cell]=True
+    epsilonF.vector()[subdomains.where_equal(2)]=VacuumMaterial.Eps
+    kappaF.vector()[subdomains.where_equal(2)]=VacuumMaterial.Kappa
+    nurF.vector()[subdomains.where_equal(2)]=VacuumMaterial.Nur
+    nuiF.vector()[subdomains.where_equal(2)]=VacuumMaterial.Nui
 
-    for cell_number in range(len(subdomains.array())):
-        subdomain_no = subdomains.array()[cell_number]
-        #print('subdomain_no cell_no',subdomain_no, cell_number)
-        if subdomain_no==1:
-            epsilonF.vector()[cell_number]=BeamMaterial.Eps
-            kappaF.vector()[cell_number]=BeamMaterial.Kappa
-            nurF.vector()[cell_number]=BeamMaterial.Nur
-            nuiF.vector()[cell_number]=BeamMaterial.Nui
-        if subdomain_no==2:
-            epsilonF.vector()[cell_number]=VacuumMaterial.Eps
-            kappaF.vector()[cell_number]=VacuumMaterial.Kappa
-            nurF.vector()[cell_number]=VacuumMaterial.Nur
-            nuiF.vector()[cell_number]=VacuumMaterial.Nui
-        if subdomain_no==3:
-            epsilonF.vector()[cell_number]=Steel.Eps
-            kappaF.vector()[cell_number]=Steel.Kappa
-            nurF.vector()[cell_number]=Steel.Nur
-            nuiF.vector()[cell_number]=Steel.Nui
-        if subdomain_no==4:
-            epsilonF.vector()[cell_number]=Copper.Eps
-            kappaF.vector()[cell_number]=Copper.Kappa
-            nurF.vector()[cell_number]=Copper.Nur
-            nuiF.vector()[cell_number]=Copper.Nui
+    epsilonF.vector()[subdomains.where_equal(3)]=Steel.Eps
+    kappaF.vector()[subdomains.where_equal(3)]=Steel.Kappa
+    nurF.vector()[subdomains.where_equal(3)]=Steel.Nur
+    nuiF.vector()[subdomains.where_equal(3)]=Steel.Nui
 
-        if subdomain_no==5:
-            epsilonF.vector()[cell_number]=Ferrite.Eps
-            kappaF.vector()[cell_number]=Ferrite.Kappa
-            nurF.vector()[cell_number]=Ferrite.Nur
-            nuiF.vector()[cell_number]=Ferrite.Nui
-        if subdomain_no==6:
-            epsilonF.vector()[cell_number]=Titanium.Eps
-            kappaF.vector()[cell_number]=Titanium.Kappa
-            nurF.vector()[cell_number]=Titanium.Nur
-            nuiF.vector()[cell_number]=Titanium.Nui
-        if subdomain_no==7:
-            epsilonF.vector()[cell_number]=Dielectric.Eps
-            kappaF.vector()[cell_number]=Dielectric.Kappa
-            nurF.vector()[cell_number]=Dielectric.Nur
-            nuiF.vector()[cell_number]=Dielectric.Nui
+    epsilonF.vector()[subdomains.where_equal(4)]=Copper.Eps
+    kappaF.vector()[subdomains.where_equal(4)]=Copper.Kappa
+    nurF.vector()[subdomains.where_equal(4)]=Copper.Nur
+    nuiF.vector()[subdomains.where_equal(4)]=Copper.Nui
 
-    print("Material properties as DG-0 functions on mesh available")
+    epsilonF.vector()[subdomains.where_equal(5)]=Ferrite.Eps
+    kappaF.vector()[subdomains.where_equal(5)]=Ferrite.Kappa
+    nurF.vector()[subdomains.where_equal(5)]=Ferrite.Nur
+    nuiF.vector()[subdomains.where_equal(5)]=Ferrite.Nui
+
+    epsilonF.vector()[subdomains.where_equal(6)]=Titanium.Eps
+    kappaF.vector()[subdomains.where_equal(6)]=Titanium.Kappa
+    nurF.vector()[subdomains.where_equal(6)]=Titanium.Nur
+    nuiF.vector()[subdomains.where_equal(6)]=Titanium.Nui
+
+    epsilonF.vector()[subdomains.where_equal(7)]=Dielectric.Eps
+    kappaF.vector()[subdomains.where_equal(7)]=Dielectric.Kappa
+    nurF.vector()[subdomains.where_equal(7)]=Dielectric.Nur
+    nuiF.vector()[subdomains.where_equal(7)]=Dielectric.Nui
+
+    print("Material properties as DG-0 (Discontinuous Galerkin) functions on mesh available")
     return [nurF,nuiF,epsilonF,kappaF]
 ### The distribution of nur, nui, kappa and eps is returned
 ######################################################################
