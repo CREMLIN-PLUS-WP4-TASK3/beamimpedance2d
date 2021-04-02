@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 FEniCS 2D beam coupling impedance simulation in frequency domain
 
@@ -61,7 +63,6 @@ MeshFileName='simplepipe'
 print ("Mesh imported and converted! File: " + MeshFileName )
 #############################################################
 
-
 ######################################################################################
 #Beam parameters (SI units)
 px=0.0  #x-position
@@ -117,14 +118,14 @@ stopf=5e9
 ###############################################################
 
 
-#############################################################
-#Import Material Data for specific Ferrite
-if dispersive:
-    #Material.MaterialTest()
-    [fArray,murArray,muiArray]=Material.PermeabilityRead()
-    #PostProc.PlotZtrans(fArray,PostProc.RealToComplex(murArray,muiArray),PostProc.RealToComplex(murArray,muiArray))
-    #pylab.show()
-#############################################################
+# #############################################################
+# #Import Material Data for specific Ferrite
+# if dispersive:
+#     #Material.MaterialTest()
+#     [fArray,murArray,muiArray]=Material.PermeabilityRead()
+#     #PostProc.PlotZtrans(fArray,PostProc.RealToComplex(murArray,muiArray),PostProc.RealToComplex(murArray,muiArray))
+#     #pylab.show()
+# #############################################################
 
 
 
@@ -135,11 +136,11 @@ if dispersive:
 #parameters["reorder_dofs_serial"] = False #Order dofs in the same way as vertices
 ##############################################################
 
-######################################
-if plot3Dflag:
-    viz=plot(mesh, basename='mesh')
-    #viz.write_png('mesh')
-######################################
+# ######################################
+# if plot3Dflag:
+#     viz=plot(mesh, basename='mesh')
+#     #viz.write_png('mesh')
+# ######################################
 
 ######################################################################################################################
 # Function Spaces and Functions
@@ -208,8 +209,8 @@ if plot3Dflag:
         #viz.write_png('Jszr.png')
         #interactive()
 
-#tcur=assemble(Jszr*dx, mesh=mesh)
-#print ('tcur= ', tcur)
+# tcur=assemble(Jszr*dx, mesh=mesh)
+# print ('tcur= ', tcur)
 
 rhor=Jszr*1.0/(beta*c0)
 rhoi=Jszi*1.0/(beta*c0)

@@ -8,7 +8,7 @@ by Uwe Niedermayer 2014
 import math
 import os
 import builtins
-
+from pathlib import Path
 
 
 ###Constants (SI-units)
@@ -29,11 +29,11 @@ builtins.div_order=1
 
 
 ###Result folder
-builtins.resultfolder="./SIS100-EmergencyKicker-RESULTS-roomtemp/"
+builtins.resultfolder=Path("output")
 try:
-    os.system('mkdir '+ resultfolder)
-except:
-    print ("results directory already exists")
+    builtins.resultfolder.mkdir()
+except FileExistsError:
+    pass
 
 ###Ferrite Data file
 #builtins.FerriteDataFile="mischung43.dat"
@@ -50,9 +50,4 @@ builtins.dataexport=True # Write (Overwrite) file in the result folder
 builtins.wallcurrent=False    #compute and export wall current
 builtins.SIBC=False           # Use surface impedance boundary condition. 
 builtins.kappa_s=6e9 #cold copper         # Wall conductivity for single layer surface impedance
-builtins.twolayer=False   
-
-
-
-
-
+builtins.twolayer=False

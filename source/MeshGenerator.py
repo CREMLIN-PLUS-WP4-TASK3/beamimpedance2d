@@ -51,13 +51,13 @@ def MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferr
     nurF=Function(V0)
     nuiF=Function(V0)
 
-    cell_markers0 = MeshFunction("bool", mesh, mesh.topology().dim() - 1)    #beam
-    cell_markers1 = MeshFunction("bool", mesh, mesh.topology().dim() - 1)    #vacuum
-    cell_markers2 = MeshFunction("bool", mesh, mesh.topology().dim() - 1)    #Steel
-    cell_markers3 = MeshFunction("bool", mesh, mesh.topology().dim() - 1)    #Copper
-    cell_markers4 = MeshFunction("bool", mesh, mesh.topology().dim() - 1)    #Ferrite
-    cell_markers5 = MeshFunction("bool", mesh, mesh.topology().dim() - 1)    #Grounding
-    cell_markers6 = MeshFunction("bool", mesh, mesh.topology().dim() - 1)    #Dielectric
+    cell_markers0 = MeshFunction("bool", mesh, mesh.topology().dim())    #beam
+    cell_markers1 = MeshFunction("bool", mesh, mesh.topology().dim())    #vacuum
+    cell_markers2 = MeshFunction("bool", mesh, mesh.topology().dim())    #Steel
+    cell_markers3 = MeshFunction("bool", mesh, mesh.topology().dim())    #Copper
+    cell_markers4 = MeshFunction("bool", mesh, mesh.topology().dim())    #Ferrite
+    cell_markers5 = MeshFunction("bool", mesh, mesh.topology().dim())    #Grounding
+    cell_markers6 = MeshFunction("bool", mesh, mesh.topology().dim())    #Dielectric
     cell_markers0.set_all(False)
     cell_markers1.set_all(False)
     cell_markers2.set_all(False)
