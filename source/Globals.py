@@ -40,7 +40,7 @@ except FileExistsError:
 builtins.FerriteDataFile="mu8c11.dat"
 
 ###Options
-builtins.logscale=False     #log or lin frequency stepping
+builtins.logscale=True     #log or lin frequency stepping
 builtins.dispersive=False  #Only for dispersive material update is required, set false if nondispersive-->faster
 builtins.plot3Dflag=False#Make all 3D plots (use only for one frequency point)
 builtins.quadrupole=False       #Quadrupole transverse impedance (very preliminary!!!)
@@ -48,6 +48,6 @@ builtins.dipole=False       #Dipole transverse impedance
 builtins.horizontal=True     # Only relevant for dipole=True
 builtins.dataexport=True # Write (Overwrite) file in the result folder
 builtins.wallcurrent=False    #compute and export wall current
-builtins.SIBC=False           # Use surface impedance boundary condition. 
+builtins.SIBC=False           # Use surface impedance boundary condition.
 builtins.kappa_s=6e9 #cold copper         # Wall conductivity for single layer surface impedance
 builtins.twolayer=False

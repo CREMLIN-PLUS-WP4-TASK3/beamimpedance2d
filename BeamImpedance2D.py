@@ -47,8 +47,8 @@ zero=Constant(0.0)
 #MeshFileName='simplepipeDeltaZt_S2'
 #MeshFileName='collimator_shifted'
 #####MeshFileName='simplepipeDeltaZt'
-MeshFileName='simplepipe'
-#MeshFileName='ThinShellPipeZt_eps'
+# MeshFileName='simplepipe'
+MeshFileName='ThinShellPipeZt_eps'
 #MeshFileName='fccCoating300'
 #MeshFileName='fcc'
 #MeshFileName='fccWithoutHole'
@@ -108,7 +108,7 @@ g_ana=0.25+ln(b/a) #longitudinal space charge impedance geometry factor
 
 ###############################################################
 #Frequency stepping
-maxfpoints=1 #Number of frequency points to compute
+maxfpoints=30 #Number of frequency points to compute
 #logscale
 startfexp=3.0
 stopfexp=5.0
@@ -182,13 +182,13 @@ if dipole:
     #Jszr=project(RHS.ExCurrentShifted(mesh,subdomains,q,a,0.0,d/2.0)-RHS.ExCurrentShifted(mesh,subdomains,q,a,0.0,-d/2.0),Vcurllr)
     Monointegral=assemble(Jszr*dx)
     if horizontal:
-        DIP=Expression('x[0]-px',px=px)
+        DIP=Expression('x[0]-px',px=px, degree=2)
     else:
-        DIP=Expression('x[1]-py',py=py)
+        DIP=Expression('x[1]-py',py=py, degree=2)
 
     Dipintegral=assemble((Jszr*DIP)*dx)
 
-    Quad=Expression('(x[0]-px)*(x[0]-px)-(x[1]-py)*(x[1]-py)',px=px, py=py)
+    Quad=Expression('(x[0]-px)*(x[0]-px)-(x[1]-py)*(x[1]-py)',px=px, py=py, degree=2)
     Quadintegral=assemble((Jszr*Quad)*dx)
     #mp=project(RHS.ExCurrentShifted(mesh,subdomains,q,a,0.0,0.0),Vcurllr)
     #Monointegral=assemble(mp*dx)
@@ -205,13 +205,13 @@ else:
 
 Jszi=zero
 
-fle = File('/tmp/out.pvd')
-fle << Jszr
+# output_file = File('source.pvd')
+# output_file << Jszr
 
-if plot3Dflag:
-        viz=plot(Jszr, mesh=mesh,interactive=True,title='Jszr', basename='Jszr')
-        #viz.write_png('Jszr.png')
-        #interactive()
+# if plot3Dflag:
+#         viz=plot(Jszr, mesh=mesh,interactive=True,title='Jszr', basename='Jszr')
+#         #viz.write_png('Jszr.png')
+#         #interactive()
 
 # tcur=assemble(Jszr*dx, mesh=mesh)
 # print ('tcur= ', tcur)
@@ -225,7 +225,7 @@ rhoi=Jszi*1.0/(beta*c0)
 # Create frequency arrays
 # Note that omega is just a scalar for the current frequency point
 if logscale:
-    f = numpy.logspace(startfexp, stopfexp, num=numpy.int(pointsperdecade*(stopfexp-startfexp)))
+    f = numpy.logspace(startfexp, stopfexp, num=numpy.int(pointsperdecade*(stopfexp-startfexp)))[0:maxfpoints]
 else:
     f = numpy.linspace(startf, stopf, num=maxfpoints)
 
@@ -323,6 +323,10 @@ for i, fpoint in enumerate(f):
     Edivti=project(-nabla_grad(Phii),Hcurl)
     Edivlr= project(-omega/(beta *c0) *Phii,H1)
     Edivli= project(omega/(beta *c0) *Phir,H1)
+
+    output_file = File('Phi.pvd')
+    output_file << Phir
+    output_file << Phii
 
     # output_file = File('Ediv.pvd')
     # output_file << Edivtr
@@ -441,70 +445,70 @@ for i, fpoint in enumerate(f):
         print
     ###################################################################################################
 
-#     ############################################################
-#     #calculate conduction current
-#     if wallcurrent:
-#         Jcondr=Elr*kappa
-#         Jcondi=Eli*kappa
-#         TotalCurrent[i]=assemble(Jcondr*dx)+I*assemble(Jcondi*dx)
-#         print ('Totalcurrent: ', TotalCurrent[i])
-#         Zlongloss[i]=(length/q**2)*(assemble(inner(Elr,Jcondr)*dx)+assemble(inner(Eli,Jcondi)*dx))
-#     ##############################################################
+    ############################################################
+    #calculate conduction current
+    if wallcurrent:
+        Jcondr=Elr*kappa
+        Jcondi=Eli*kappa
+        TotalCurrent[i]=assemble(Jcondr*dx)+I*assemble(Jcondi*dx)
+        print ('Totalcurrent: ', TotalCurrent[i])
+        Zlongloss[i]=(length/q**2)*(assemble(inner(Elr,Jcondr)*dx)+assemble(inner(Eli,Jcondi)*dx))
+    ##############################################################
 
 
-#     if(plot3Dflag):
-#         plot(Etr,title='Etr')
-#         plot(Eti,title='Eti')
-#         plot(Elr,title='Elr')
-#         plot(Eli,title='Eli')
-#         interactive()
+    if(plot3Dflag):
+        plot(Etr,title='Etr')
+        plot(Eti,title='Eti')
+        plot(Elr,title='Elr')
+        plot(Eli,title='Eli')
+        interactive()
 
-# #End of f-loop
-# ###########################################################################
+#End of f-loop
+###########################################################################
 
-# ##################################################################################################################
+##################################################################################################################
 
-# #############################################################
-# ##Export impedance
-# if dataexport:
-#     ExportName=MeshFileName+'beta'+str(beta)
-#     if dipole:
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_full.dat',f,Ztrans_full)
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_ind.dat',f,Ztrans_ind)
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_full.dat',f,ZscTr_ana)
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_ind.dat',f,ZscTr_ana_indirect)
-#     else:
-#         PostProc.CplxImpExport(ExportName+'Zl.dat',f,Zlong)
-#     if wallcurrent:
-#         PostProc.CplxImpExport(ExportName+'ZlLoss.dat',f,Zlongloss)
-#         PostProc.CplxImpExport(ExportName+'Current.dat',f,TotalCurrent)
+#############################################################
+##Export impedance
+if dataexport:
+    ExportName=MeshFileName+'beta'+str(beta)
+    if dipole:
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_full.dat',f,Ztrans_full)
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_ind.dat',f,Ztrans_ind)
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_full.dat',f,ZscTr_ana)
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_ind.dat',f,ZscTr_ana_indirect)
+    else:
+        PostProc.CplxImpExport(ExportName+'Zl.dat',f,Zlong)
+    if wallcurrent:
+        PostProc.CplxImpExport(ExportName+'ZlLoss.dat',f,Zlongloss)
+        PostProc.CplxImpExport(ExportName+'Current.dat',f,TotalCurrent)
 
-# #############################################################
-
-
-
-# #############################################################
-# #Plot impedance
-# if dipole:
-#     if quadrupole:
-#         PostProc.PlotZtrans(f,numpy.multiply(a**2,Ztrans_full),ZscTr_ana,'Full Transverse Impedance')
-#         #PostProc.PlotZtrans(f,Ztrans_full,numpy.multiply(1/(2*a**2),ZscTr_ana),'Full Transverse Impedance')
-#         PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
-#     else:
-#         #PostProc.PlotZtranslinear(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
-#         PostProc.PlotZtrans(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
-#         PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
-# else:
-#     if wallcurrent:
-#         PostProc.PlotZlong(f,Zlong,Zlongloss,Zsc_ana)
-#     else:
-#         PostProc.PlotZlong(f,Zlong,Zlong,Zsc_ana)
-# ##############################################################
+#############################################################
 
 
-# ################################################################################
-# #Plot Conduction current
-# if wallcurrent:
-#     PostProc.PlotWallCurrent(f,TotalCurrent)
-# ################################################################################
-# pylab.show()
+
+#############################################################
+#Plot impedance
+if dipole:
+    if quadrupole:
+        PostProc.PlotZtrans(f,numpy.multiply(a**2,Ztrans_full),ZscTr_ana,'Full Transverse Impedance')
+        #PostProc.PlotZtrans(f,Ztrans_full,numpy.multiply(1/(2*a**2),ZscTr_ana),'Full Transverse Impedance')
+        PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
+    else:
+        #PostProc.PlotZtranslinear(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
+        PostProc.PlotZtrans(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
+        PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
+else:
+    if wallcurrent:
+        PostProc.PlotZlong(f,Zlong,Zlongloss,Zsc_ana)
+    else:
+        PostProc.PlotZlong(f,Zlong,Zlong,Zsc_ana)
+##############################################################
+
+
+################################################################################
+#Plot Conduction current
+if wallcurrent:
+    PostProc.PlotWallCurrent(f,TotalCurrent)
+################################################################################
+pylab.show()

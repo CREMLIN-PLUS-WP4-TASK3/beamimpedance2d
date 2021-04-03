@@ -41,29 +41,35 @@ from dolfin import *
 #         else:
 #             values[0]=0.0
 
-# class RingDipole(Expression):
-#     def __init__(self,a,eps,xd,yd):
-#         self.a_=a
-#         self.eps_=eps
-#         self.xd_=xd
-#         self.yd_=yd
+class RingDipole(UserExpression):
+    def __init__(self,a,eps,xd,yd,*args,**kwargs):
+        self.a_=a
+        self.eps_=eps
+        self.xd_=xd
+        self.yd_=yd
+        super().__init__(*args,**kwargs)
 
-#     def eval(self,values,x):
-#         r=((x[0]-self.xd_)**2+(x[1]-self.yd_)**2)**0.5
-#         cosPhi=(x[0]-self.xd_)/r
-#         sinPhi=(x[1]-self.yd_)/r
-#         if (r>self.a_-self.eps_ and r<self.a_+self.eps_):
-#             if horizontal:
-#                 values[0]=cosPhi
-#                 #if (r<self.a_):
-#                 #    values[0]=(r-self.a_+self.eps_)*cosPhi
-#                 #else:
-#                 #    values[0]=(r-self.a_+self.eps_)*cosPhi
-#             else:
-#                 values[0]=(r-self.a_+self.eps_)*sinPhi
-#         else:
-#             values[0]=0.0
-
+    def eval(self,values,x):
+        assert(self.a_ != None)
+        assert(self.eps_ != None)
+        assert(self.xd_ != None)
+        assert(self.yd_ != None)
+        r=((x[0]-self.xd_)**2+(x[1]-self.yd_)**2)**0.5
+        if near(r, 0.0):
+            r = DOLFIN_EPS
+        cosPhi=(x[0]-self.xd_)/r
+        sinPhi=(x[1]-self.yd_)/r
+        if (r>self.a_-self.eps_ and r<self.a_+self.eps_):
+            if horizontal:
+                values[0]=cosPhi
+                #if (r<self.a_):
+                #    values[0]=(r-self.a_+self.eps_)*cosPhi
+                #else:
+                #    values[0]=(r-self.a_+self.eps_)*cosPhi
+            else:
+                values[0]=(r-self.a_+self.eps_)*sinPhi
+        else:
+            values[0]=0.0
 
 # class RingQuadrupole(Expression):
 #     def __init__(self,a,eps,xd,yd):
@@ -157,28 +163,30 @@ def ExCurrentShifted(mesh,subdomains,q,a,delta_x,delta_y):
     return Jz/Area
 
 
-# def ExCurrentShiftedDipole(mesh,subdomains,q,a,eps,xd,yd):
-#     Source=RingDipole(a,eps,xd,yd)
+def ExCurrentShiftedDipole(mesh,subdomains,q,a,eps,xd,yd):
+    #######################################
+    #calculate proper dipole moment for normalzation
+    Vdip=FunctionSpace(mesh,'Lagrange',1)
 
 
-#     #DipEx=Expression('x[0]-xd',xd=xd)
-#     if horizontal:
-#         DipTest=Expression('x[0]-xd',xd=xd)
-#     else:
-#         DipTest=Expression('x[1]-yd',yd=yd)
+    Source=RingDipole(a,eps,xd,yd,element=Vdip.ufl_element())
+    # Source=UserExpression(ring_dipole_code)
 
-#     #######################################
-#     #calculate proper dipole moment for normalzation
-#     Vdip=FunctionSpace(mesh,'CG',1)
 
-#     #DipExFunction=project(Source,Vdip)
-#     #Dipolemoment=assemble(DipExFunction*DipTest*dx)
-#     DipTestFunction=project(Source,Vdip)
-#     DipolemomentTEST=assemble(DipTestFunction*DipTest*dx)
-#     print("Dipole Moment: " , DipolemomentTEST)
-#     #######################################
+    #DipEx=Expression('x[0]-xd',xd=xd)
+    if horizontal:
+        DipTest=Expression('x[0]-xd',xd=xd, degree=2)
+    else:
+        DipTest=Expression('x[1]-yd',yd=yd)
 
-#     return Source/DipolemomentTEST
+    #DipExFunction=project(Source,Vdip)
+    #Dipolemoment=assemble(DipExFunction*DipTest*dx)
+    DipTestFunction=project(Source,Vdip)
+    DipolemomentTEST=assemble(DipTestFunction*DipTest*dx)
+    print("Dipole Moment: " , DipolemomentTEST)
+    #######################################
+
+    return Source/DipolemomentTEST
 
 
 # def ExCurrentShiftedQuadrupole(mesh,subdomains,q,a,eps,xd,yd):

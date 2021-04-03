@@ -155,3 +155,5 @@ cython_debug/
 *.geo
 *.geo.opt
 *.h
+
+jitfailure-dolfin*

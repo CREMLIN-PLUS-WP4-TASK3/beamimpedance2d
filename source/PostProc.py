@@ -32,11 +32,11 @@ def Ztrans(Elr,Eli,Jszr,Jszi, omega, beta,xd,yd):
     Jzifct=Jszi
     
     if horizontal:
-        DipTest=Expression('x[0]-xd',xd=xd)
+        DipTest=Expression('x[0]-xd',xd=xd,degree=2)
     else:
-        DipTest=Expression('x[1]-yd',yd=yd)
+        DipTest=Expression('x[1]-yd',yd=yd,degree=2)
     
-    QuadTest=Expression('(x[0]-xd)*(x[0]-xd)-(x[1]-yd)*(x[1]-yd)',xd=xd, yd=yd)
+    QuadTest=Expression('(x[0]-xd)*(x[0]-xd)-(x[1]-yd)*(x[1]-yd)',xd=xd, yd=yd,degree=2)
     #x=Expression('x[0]')
     DM=assemble(DipTest*Jzrfct*dx)
     QM=1.0#assemble(QuadTest*Jzrfct*dx)

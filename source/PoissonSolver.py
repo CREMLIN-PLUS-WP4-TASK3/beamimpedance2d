@@ -40,9 +40,10 @@ def CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
 
 
     # set_log_level(PROGRESS)
-    # solve(eq, Phi,BC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
+    solve(eq, Phi,BC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
+    # solve(eq, Phi,BC,solver_parameters={"linear_solver": "gmres","preconditioner": "ilu"})
     # solve(eq, Phi,BC,solver_parameters={"linear_solver": "gmres","preconditioner": "sor"})
-    solve(eq, Phi,BC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
+    # solve(eq, Phi,BC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
     (Phir,Phii)=Phi.split(deepcopy=False)
 
     if(plot3Dflag):

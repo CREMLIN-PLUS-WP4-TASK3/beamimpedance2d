@@ -205,8 +205,8 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
     if SIBC:
         solve(equation, Ecurl,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
     else:
-        # solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
-        solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
+        solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
+        # solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
         # solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "gmres","preconditioner": "sor"})
     print("solver done")
     #################
@@ -290,7 +290,9 @@ def CurlCurl(mesh,omega, beta, epsilon, kappa, nu, RHSsr, RHSsi, RHSvr,RHSvi):
 
     ################
     # set_log_level(PROGRESS)
-    solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
+    # solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
+    solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
+    # solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "gmres","preconditioner": "ilu"})
     print("solver done")
     #################
 
