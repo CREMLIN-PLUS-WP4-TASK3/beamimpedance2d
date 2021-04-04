@@ -51,9 +51,9 @@ def ZAmat(scal,omega,beta):
 
 ###################################################################
 def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSvr,RHSvi):
-    domains = MeshFunction("size_t", mesh, 0)
+    domains = MeshFunction("size_t", mesh, mesh.topology().dim())
     domains.set_all(0)
-    dx = Measure("dx")[domains]
+    dx = Measure("dx")(subdomain_data=domains)
 
     ################################################################
     # SIBC
@@ -63,29 +63,22 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
 
     AdmittanceBoundaryObject=AdmittanceBoundary()
 
-    Abdy = MeshFunction("size_t", mesh, 1)
+    Abdy = MeshFunction("size_t", mesh, mesh.topology().dim()-1)
     Abdy.set_all(0)
 
     AdmittanceBoundaryObject.mark(Abdy,0)
-    ds = Measure("ds")[Abdy]
+    ds = Measure("ds")(subdomain_data=Abdy)
     n = -FacetNormal(mesh)  #Normal pointing inwards
     #plot(assemble(n,mesh=mesh),mesh=mesh,interactive=True)
     #plot(n,mesh=mesh)
     ################################################################
 
-    Vtr_ = VectorElement("Nedelec 1st kind H(curl)", mesh.ufl_cell(), curl_order)
-    Vlr_ = FiniteElement("Lagrange", mesh.ufl_cell(), curl_long_order)
-    # Vtr = FunctionSpace(mesh, "Nedelec 1st kind H(curl)", curl_order)
-    # Vlr = FunctionSpace(mesh, "Lagrange", curl_long_order)
+    Vtr = VectorElement("Nedelec 1st kind H(curl)", mesh.ufl_cell(), curl_order)
+    Vlr = FiniteElement("Lagrange", mesh.ufl_cell(), curl_long_order)
+    Vli=Vlr
+    Vti=Vtr
 
-    # Vli=Vlr
-    # Vti=Vtr
-    Vli_=Vlr_
-    Vti_=Vtr_
-
-    V_ = MixedElement([Vtr_, Vti_, Vlr_, Vli_])
-
-    V= FunctionSpace(mesh, V_)                            # 3D complex vector space
+    V= FunctionSpace(mesh, MixedElement([Vtr, Vti, Vlr, Vli])) # 3D complex vector space
 
     (uvr,uvi,usr,usi) = TrialFunctions(V)
     (vvr,vvi,vsr,vsi) = TestFunctions(V)
@@ -102,7 +95,7 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
 
 
     #Only this part changes wrt the real permeabiliy case!
-    a_curlcurl=  inner(Bmat(vvr),nur*Bmat(uvr))*dx(0)  -inner(vvr,-(omega/(beta*c0))**2 *nur*uvr)*dx(0)  \
+    a_curlcurl=  inner(Bmat(vvr),nur*Bmat(uvr))*dx(0)  -inner(vvr,-(omega/(beta*c0))**2 *nur*uvr)*dx(0)
                 -inner(vvr,nui*ZAmat(usr,omega,beta))*dx(0)  \
                 -(inner(Bmat(vvr),nui*Bmat(uvi))*dx(0)  -inner(vvr,-(omega/(beta*c0))**2 *nui*uvi)*dx(0) ) \
                 -inner(vvr,nur*ZAmat(usi,omega,beta))*dx(0)  \
@@ -237,19 +230,12 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
 
 ###################################################################
 def CurlCurl(mesh,omega, beta, epsilon, kappa, nu, RHSsr, RHSsi, RHSvr,RHSvi):
-    Vtr_ = FiniteElement("Nedelec 1st kind H(curl)", mesh.ufl_cell(), curl_order)
-    Vlr_ = FiniteElement("Lagrange", mesh.ufl_cell(), curl_long_order)
-    # Vtr = FunctionSpace(mesh, "Nedelec 1st kind H(curl)", curl_order)
-    # Vlr = FunctionSpace(mesh, "CG", curl_long_order)
+    Vtr = FiniteElement("Nedelec 1st kind H(curl)", mesh.ufl_cell(), curl_order)
+    Vlr = FiniteElement("Lagrange", mesh.ufl_cell(), curl_long_order)
+    Vli = Vlr
+    Vti = Vtr
 
-    # Vli=Vlr
-    # Vti=Vtr
-    Vli_=Vlr_
-    Vti_=Vtr_
-
-    V_ = MixedElement([Vtr_, Vti_, Vlr_, Vli_])
-
-    V= FunctionSpace(mesh, V_)                            # 3D complex vector space
+    V= FunctionSpace(mesh, MixedElement([Vtr, Vti, Vlr, Vli])) # 3D complex vector space
 
     (uvr,uvi,usr,usi) = TrialFunctions(V)
     (vvr,vvi,vsr,vsi) = TestFunctions(V)
@@ -260,7 +246,32 @@ def CurlCurl(mesh,omega, beta, epsilon, kappa, nu, RHSsr, RHSsi, RHSvr,RHSvi):
     #Ecurllr=Function(Vlr)
     #Ecurlli=Function(Vli)
 
-
+    """
+    $
+    A_\varepsilon=-\omega^2\left(
+    \int_\Omega{v_v^\Re\cdot\varepsilon u_v^\Re d\Omega}+
+    \int_\Omega{v_v^\Im\cdot\varepsilon u_v^\Im d\Omega}+
+    \int_\Omega{v_s^\Re\cdot\varepsilon u_s^\Re d\Omega}+
+    \int_\Omega{v_s^\Im\cdot\varepsilon u_s^\Im d\Omega}
+    \right)
+    $
+    $
+    A_\kappa=\omega\left(
+    \int_\Omega{v_v^\Im\cdot\kappa u_v^\Re d\Omega}-
+    \int_\Omega{v_v^\Re\cdot\kappa u_v^\Im d\Omega}+
+    \int_\Omega{v_s^\Im\cdot\kappa u_s^\Re d\Omega}-
+    \int_\Omega{v_s^\Re\cdot\kappa u_s^\Im d\Omega}
+    \right)
+    $
+    $
+    A_{\nabla}=\left(
+    \int_\Omega{v_v^\Im\cdot\kappa u_v^\Re d\Omega}-
+    \int_\Omega{v_v^\Re\cdot\kappa u_v^\Im d\Omega}+
+    \int_\Omega{v_s^\Im\cdot\kappa u_s^\Re d\Omega}-
+    \int_\Omega{v_s^\Re\cdot\kappa u_s^\Im d\Omega}
+    \right)
+    $
+    """
     a_epsilon=-omega*omega*(inner(vvr,epsilon*uvr)*dx + inner(vvi,epsilon*uvi)*dx + inner(vsr,epsilon*usr)*dx + inner(vsi,epsilon*usi)*dx)
     a_kappa=omega*(inner(vvi,kappa*uvr)*dx - inner(vvr,kappa*uvi)*dx + inner(vsi,kappa*usr)*dx - inner(vsr,kappa*usi)*dx)
 
@@ -269,15 +280,9 @@ def CurlCurl(mesh,omega, beta, epsilon, kappa, nu, RHSsr, RHSsi, RHSvr,RHSvi):
                  -inner(vvi,-(omega/(beta*c0))**2 *nu*uvi)*dx +inner(vvi,nu*ZAmat(usr,omega,beta))*dx +inner(Bmat(vvi),nu*Bmat(uvi))*dx  \
                     +inner(Amat(vsi),nu*Zmat(uvr,omega,beta))*dx + inner(Amat(vsi),nu*Amat(usi))*dx
 
-
-
-
-
     RHS=RHSsr*vsi*dx + RHSsi*vsi*dx + inner(RHSvr,vvr)*dx + inner(RHSvi,vvi) *dx
 
     equation = a_curlcurl +a_kappa + a_epsilon == RHS
-
-
 
     ##################################################################################
     Zero = Expression(('0','0','0','0','0','0'), degree=6)
@@ -297,7 +302,6 @@ def CurlCurl(mesh,omega, beta, epsilon, kappa, nu, RHSsr, RHSsi, RHSvr,RHSvi):
     #################
 
     [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=Ecurl.split(deepcopy=True)
-
 
     if(plot3Dflag):
         plot(Ecurltr,title='Ecurltr')

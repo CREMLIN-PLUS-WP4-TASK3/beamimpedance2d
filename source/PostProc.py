@@ -57,7 +57,7 @@ def CplxImpExport(filename,f,Z):
     completeName=os.path.join(resultfolder,filename)
     Zfile=open(completeName,'w')
     for j in range(len(f)):
-        Zfile.write(str(f[j])+"\t" +str(Z[j].real) +"\t " + str(Z[j].imag) + "\n")
+        Zfile.write(str(f[j])+"\t" +str(Z[j].real) +"\t" + str(Z[j].imag) + "\n")
     Zfile.close()
     return None
 

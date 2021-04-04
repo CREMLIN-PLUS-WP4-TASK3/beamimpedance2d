@@ -6,26 +6,51 @@ by Uwe Niedermayer 2014
 
 from dolfin import *
 def CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
-    H1_ = FiniteElement("Lagrange", mesh.ufl_cell(), div_long_order)    #Space for the Potential
-    H1 = FunctionSpace(mesh, "Lagrange",div_long_order)    #Space for the Potential
-    Mix=FunctionSpace(mesh, H1_*H1_)
+    H1 = FiniteElement("Lagrange", mesh.ufl_cell(), div_long_order)    #Space for the Potential
+    Mix=FunctionSpace(mesh, MixedElement([H1, H1]))
 
     (ur,ui) = TrialFunctions(Mix)
     (vr,vi) = TestFunctions(Mix)
 
     Phi=Function(Mix)
-    Phir=Function(H1)
-    Phii=Function(H1)
 
     #The stiffness matrices
+    """
+    $
+    \int_\Omega{\nabla v^\Re \cdot \varepsilon \nabla u^\Re d\Omega}+
+    \int_\Omega{\nabla v^\Re \cdot \frac{\kappa}{\omega} \nabla u^\Im d\Omega}
+    $
+    $
+    \int_\Omega{\nabla v^\Im \cdot \varepsilon \nabla u^\Im d\Omega}-
+    \int_\Omega{\nabla v^\Im \cdot \frac{\kappa}{\omega} \nabla u^\Re d\Omega}
+    $
+    """
     ar=inner(grad(vr),epsilon*grad(ur))*dx +inner(grad(vr),(kappa/omega)*grad(ui))*dx
     ai=inner(grad(vi),epsilon*grad(ui))*dx -inner(grad(vi),(kappa/omega)*grad(ur))*dx
 
     #The mass matrices
+    """
+    $
+    \frac{\omega^2}{\beta^2 c^2}\left(
+    \int_\Omega{v^\Re \cdot \varepsilon u^\Re d\Omega}+
+    \int_\Omega{v^\Re \cdot \frac{\kappa}{\omega} u^\Im d\Omega}
+    \right)
+    $
+    $
+    \frac{\omega^2}{\beta^2 c^2}\left(
+    \int_\Omega{v^\Im \cdot \varepsilon u^\Im d\Omega}-
+    \int_\Omega{v^\Im \cdot \frac{\kappa}{\omega} u^\Re d\Omega}
+    \right)
+    $
+    """
     br=(omega/(beta*c0))**2 * (inner(vr,epsilon*ur)*dx +inner(vr,(kappa/omega)*ui)*dx )
     bi=(omega/(beta*c0))**2 * (inner(vi,epsilon*ui)*dx -inner(vi,(kappa/omega)*ur)*dx )
 
     #The right hand side
+    """
+    $\frac{1}{\beta c}\int_\Omega{J_{sz}^\Re v^\Re d\Omega}$
+    $\frac{1}{\beta c}\int_\Omega{J_{sz}^\Im v^\Im d\Omega}$
+    """
     RHSr=1/(beta*c0) *vr*Jszr*dx
     RHSi=1/(beta*c0) *vi*Jszi*dx
 
@@ -33,18 +58,15 @@ def CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
 
 
     Zero = Expression(('0.0','0.0'), degree=2)
-    def u0_boundary(x, on_boundary):    # returns boolean if x on boundary
-        return on_boundary
-
-    BC=DirichletBC(Mix, Zero, u0_boundary)
+    BC=DirichletBC(Mix, Zero, lambda _, on_boundary: on_boundary)
 
 
     # set_log_level(PROGRESS)
-    solve(eq, Phi,BC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
+    solve(eq,Phi,BC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
     # solve(eq, Phi,BC,solver_parameters={"linear_solver": "gmres","preconditioner": "ilu"})
     # solve(eq, Phi,BC,solver_parameters={"linear_solver": "gmres","preconditioner": "sor"})
     # solve(eq, Phi,BC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
-    (Phir,Phii)=Phi.split(deepcopy=False)
+    (Phir,Phii)=Phi.split(deepcopy=True)
 
     if(plot3Dflag):
         plot(Phir,title='Phir')

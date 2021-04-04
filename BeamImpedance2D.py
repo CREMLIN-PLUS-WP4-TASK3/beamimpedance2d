@@ -30,7 +30,7 @@ from source import RHS
 #from source import Boundary
 from source import Material
 
-from vedo.dolfin import plot
+# from vedo.dolfin import plot
 
 # constants: (SI units)
 zero=Constant(0.0)
@@ -47,8 +47,8 @@ zero=Constant(0.0)
 #MeshFileName='simplepipeDeltaZt_S2'
 #MeshFileName='collimator_shifted'
 #####MeshFileName='simplepipeDeltaZt'
-# MeshFileName='simplepipe'
-MeshFileName='ThinShellPipeZt_eps'
+MeshFileName='simplepipe'
+# MeshFileName='ThinShellPipeZt_eps'
 #MeshFileName='fccCoating300'
 #MeshFileName='fcc'
 #MeshFileName='fccWithoutHole'
@@ -108,40 +108,35 @@ g_ana=0.25+ln(b/a) #longitudinal space charge impedance geometry factor
 
 ###############################################################
 #Frequency stepping
-maxfpoints=30 #Number of frequency points to compute
+maxfpoints=5 #Number of frequency points to compute
 #logscale
-startfexp=3.0
-stopfexp=5.0
-pointsperdecade=5
+startfexp=5.0
+stopfexp=11.0
 #linear scale
 startf=5e9
 stopf=5e9
 ###############################################################
 
 
-# #############################################################
-# #Import Material Data for specific Ferrite
-# if dispersive:
-#     #Material.MaterialTest()
-#     [fArray,murArray,muiArray]=Material.PermeabilityRead()
-#     #PostProc.PlotZtrans(fArray,PostProc.RealToComplex(murArray,muiArray),PostProc.RealToComplex(murArray,muiArray))
-#     #pylab.show()
-# #############################################################
-
-
-
-
+#############################################################
+#Import Material Data for specific Ferrite
+if dispersive:
+    #Material.MaterialTest()
+    [fArray,murArray,muiArray]=Material.PermeabilityRead()
+    #PostProc.PlotZtrans(fArray,PostProc.RealToComplex(murArray,muiArray),PostProc.RealToComplex(murArray,muiArray))
+    #pylab.show()
+#############################################################
 
 
 ##############################################################
 #parameters["reorder_dofs_serial"] = False #Order dofs in the same way as vertices
 ##############################################################
 
-# ######################################
-# if plot3Dflag:
-#     viz=plot(mesh, basename='mesh')
-#     #viz.write_png('mesh')
-# ######################################
+######################################
+if plot3Dflag:
+    viz=plot(mesh, basename='mesh')
+    #viz.write_png('mesh')
+######################################
 
 ######################################################################################################################
 # Function Spaces and Functions
@@ -205,13 +200,13 @@ else:
 
 Jszi=zero
 
-# output_file = File('source.pvd')
-# output_file << Jszr
+output_file = File('source.pvd')
+output_file << Jszr
 
-# if plot3Dflag:
-#         viz=plot(Jszr, mesh=mesh,interactive=True,title='Jszr', basename='Jszr')
-#         #viz.write_png('Jszr.png')
-#         #interactive()
+if plot3Dflag:
+        viz=plot(Jszr, mesh=mesh,interactive=True,title='Jszr', basename='Jszr')
+        #viz.write_png('Jszr.png')
+        #interactive()
 
 # tcur=assemble(Jszr*dx, mesh=mesh)
 # print ('tcur= ', tcur)
@@ -221,11 +216,12 @@ rhoi=Jszi*1.0/(beta*c0)
 # plot(Jszr,mesh=mesh,interactive=True)
 ##############################################################
 
+
 ##############################################################################################
 # Create frequency arrays
 # Note that omega is just a scalar for the current frequency point
 if logscale:
-    f = numpy.logspace(startfexp, stopfexp, num=numpy.int(pointsperdecade*(stopfexp-startfexp)))[0:maxfpoints]
+    f = numpy.logspace(startfexp, stopfexp, num=maxfpoints)
 else:
     f = numpy.linspace(startf, stopf, num=maxfpoints)
 
@@ -260,16 +256,18 @@ Dielectric=Material.MaterialProperties(1.0*nu0,0.0,100.0*eps0,0.0)
 
 
 [nur,nui,epsilon,kappa]= MeshGenerator.MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferrite,Titanium,Dielectric)
+
 # plot(nui,mesh=mesh)
 #interactive()
 print ('Material initialized!')
 #################################################################################################
 
-# output_file = File('material_props.pvd')
-# output_file << nur
-# output_file << nui
-# output_file << epsilon
-# output_file << kappa
+output_file = File('material_props.pvd')
+output_file << mesh
+output_file << nur
+output_file << nui
+output_file << epsilon
+output_file << kappa
 
 
 #The big frequency loop
@@ -278,51 +276,58 @@ for i, fpoint in enumerate(f):
     omega=2*pi*fpoint
     print ("fpoint: ", fpoint,"  f= ",fpoint/1e6,"MHz" )
 
-    # # ###############################################################################
-    # # #Analytical references
-    # # if dipole:
-    # #     if quadrupole:
-    # #         ZscTr_ana_direct[fpointiter]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    # #             scipy.special.iv(2,(omega*a)/(beta*gamma*c0))*scipy.special.kn(2,(omega*a)/(beta*gamma*c0))
-    # #         ZscTr_ana_indirect[fpointiter]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    # #             (scipy.special.iv(2,(omega*a)/(beta*gamma*c0)))**2 \
-    # #             *scipy.special.kn(2,(omega*b)/(beta*gamma*c0))/scipy.special.iv(2,(omega*b)/(beta*gamma*c0))
-    # #         ZscTr_ana[fpointiter]=ZscTr_ana_direct[fpointiter]+ZscTr_ana_indirect[fpointiter]
-    # #     else:
-    # #         ZscTr_ana_direct[fpointiter]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    # #             scipy.special.iv(1,(omega*a)/(beta*gamma*c0))*scipy.special.kn(1,(omega*a)/(beta*gamma*c0))  #check me
-    # #         ZscTr_ana_indirect[fpointiter]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    # #             (scipy.special.iv(1,(omega*a)/(beta*gamma*c0)))**2 \
-    # #             *scipy.special.kn(1,(omega*b)/(beta*gamma*c0))/scipy.special.iv(1,(omega*b)/(beta*gamma*c0))
-    # #         ZscTr_ana[fpointiter]=ZscTr_ana_direct[fpointiter]+ZscTr_ana_indirect[fpointiter]
-    # # else:
-    # #     Zsc_ana[fpointiter]=-I*omega*mu0*bgsinv*g_ana/(2*pi)*length
-    # #     #ZscTr_ana[fpointiter]=-I*bgsinv*(beta*c0*mu0)*(1.0/a**2-1.0/b**2) *length/(2*pi)  #MQS
-    # # ################################################################################
+    ###############################################################################
+    #Analytical references
+    if dipole:
+        if quadrupole:
+            ZscTr_ana_direct[i]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+                scipy.special.iv(2,(omega*a)/(beta*gamma*c0))*scipy.special.kn(2,(omega*a)/(beta*gamma*c0))
+            ZscTr_ana_indirect[i]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+                (scipy.special.iv(2,(omega*a)/(beta*gamma*c0)))**2 \
+                *scipy.special.kn(2,(omega*b)/(beta*gamma*c0))/scipy.special.iv(2,(omega*b)/(beta*gamma*c0))
+            ZscTr_ana[i]=ZscTr_ana_direct[i]+ZscTr_ana_indirect[i]
+        else:
+            ZscTr_ana_direct[i]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+                scipy.special.iv(1,(omega*a)/(beta*gamma*c0))*scipy.special.kn(1,(omega*a)/(beta*gamma*c0))  #check me
+            ZscTr_ana_indirect[i]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+                (scipy.special.iv(1,(omega*a)/(beta*gamma*c0)))**2 \
+                *scipy.special.kn(1,(omega*b)/(beta*gamma*c0))/scipy.special.iv(1,(omega*b)/(beta*gamma*c0))
+            ZscTr_ana[i]=ZscTr_ana_direct[i]+ZscTr_ana_indirect[i]
+    else:
+        Zsc_ana[i]=-I*omega*mu0*bgsinv*g_ana/(2*pi)*length
+        #ZscTr_ana[i]=-I*bgsinv*(beta*c0*mu0)*(1.0/a**2-1.0/b**2) *length/(2*pi)  #MQS
+    ################################################################################
 
-    # # ###################################################################################################
-    # # #Determine frequency dependent material parameters, update, and then imprint again on the mesh
-    # # if (dispersive):
-    # #     [nurFvalue,nuiFvalue]=Material.ReluctivityInterpolate(f[fpointiter],fArray,murArray,muiArray)
-    # #     epsFvalue=10
-    # #     print ("nur:", nurFvalue)
-    # #     print ("nui:", nuiFvalue)
-    # #     Ferrite.reluctivityUpdate(nurFvalue*nu0,nuiFvalue*nu0)
-    # #     [nur,nui,epsilon,kappa]= MeshGenerator.MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferrite,Titanium,Dielectric)
-    # #     #plot(nui,mesh=mesh,interactive=True)
-    # #     #print (nui.vector().array())
-    # #     print ('New material parameters imprinted on mesh')
-    # # ####################################################################################################
+    ###################################################################################################
+    #Determine frequency dependent material parameters, update, and then imprint again on the mesh
+    if (dispersive):
+        [nurFvalue,nuiFvalue]=Material.ReluctivityInterpolate(f[i],fArray,murArray,muiArray)
+        epsFvalue=10
+        print ("nur:", nurFvalue)
+        print ("nui:", nuiFvalue)
+        Ferrite.reluctivityUpdate(nurFvalue*nu0,nuiFvalue*nu0)
+        [nur,nui,epsilon,kappa]= MeshGenerator.MaterialOnMesh(mesh,subdomains,BeamMaterial,VacuumMaterial,Steel,Copper,Ferrite,Titanium,Dielectric)
+        #plot(nui,mesh=mesh,interactive=True)
+        #print (nui.vector().array())
+        print ('New material parameters imprinted on mesh')
+    ####################################################################################################
 
 
 
     ####################################################################################################################
     ##Calculate Ediv
     [Phir,Phii]=PoissonSolver.CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi)
+    """
+    $E_{div\;tr}^{\Re}=-\nabla\Phi^{\Re}$
+    $E_{div\;tr}^{\Im}=-\nabla\Phi^{\Im}$
+    $\left(\partial_z \rightarrow -i \omega/v\right)$
+    $E_{div\;lon}^{\Re}=-\frac{\omega}{\beta c}\Phi^{\Im}$
+    $E_{div\;lon}^{\Im}=\frac{\omega}{\beta c}\Phi^{\Re}$
+    """
     Edivtr=project(-nabla_grad(Phir),Hcurl)
     Edivti=project(-nabla_grad(Phii),Hcurl)
-    Edivlr= project(-omega/(beta *c0) *Phii,H1)
-    Edivli= project(omega/(beta *c0) *Phir,H1)
+    Edivlr= project(-omega/(beta *c0) * Phii,H1)
+    Edivli= project(omega/(beta *c0) * Phir,H1)
 
     output_file = File('Phi.pvd')
     output_file << Phir
@@ -364,6 +369,12 @@ for i, fpoint in enumerate(f):
 
     ####################################################################################################################
     #calculate RHS
+    """
+    $R_v^\Re=\varepsilon\omega^2 E_{div\;tr}^{\Re}+\omega\kappa E_{div\;tr}^{\Im}$
+    $R_v^\Im=\varepsilon\omega^2 E_{div\;tr}^{\Im}-\omega\kappa E_{div\;tr}^{\Re}$
+    $R_s^\Re=\varepsilon\omega^2 E_{div\;lon}^{\Re}+\omega\kappa E_{div\;lon}^{\Im}$
+    $R_s^\Im=\varepsilon\omega^2 E_{div\;lon}^{\Im}+\omega\kappa E_{div\;lon}^{\Re}-\omega J_{sz}^{\Re}$
+    """
     RHSvr=omega*omega*epsilon*Edivtr+omega*kappa*Edivti
     RHSvi=omega*omega*epsilon*Edivti-omega*kappa*Edivtr
     RHSsr=omega*omega*epsilon*Edivlr+omega*kappa*Edivli
@@ -380,17 +391,17 @@ for i, fpoint in enumerate(f):
 
     ####################################
 
-    # #######################################################
-    # #Check div norm of RHS
-    # #print
-    # #print ("Div-Norm of RHS")
-    # #PostProc.n_div(RHSvr,RHSvi,HSsr,RHSsi,omega,beta,mesh,Vcurltr)
-    # #########################################################
+    #######################################################
+    #Check div norm of RHS
+    #print
+    #print ("Div-Norm of RHS")
+    #PostProc.n_div(RHSvr,RHSvi,HSsr,RHSsi,omega,beta,mesh,Vcurltr)
+    #########################################################
 
     ######
     #Run curlcurl solver
-    [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurl(mesh,omega, beta, epsilon, kappa, nur, RHSsr, RHSsi, RHSvr,RHSvi)
-    # [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr/omega**2, RHSsi/omega**2, RHSvr/omega**2,RHSvi/omega**2)   #sign RHSvr
+    # [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurl(mesh,omega, beta, epsilon, kappa, nur, RHSsr, RHSsi, RHSvr,RHSvi)
+    [Ecurltr,Ecurlti,Ecurllr,Ecurlli]=CurlSolver.CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr/omega**2, RHSsi/omega**2, RHSvr/omega**2,RHSvi/omega**2)   #sign RHSvr
     #Rescaling with omega brings LF stabilization???
     ######
 
@@ -511,4 +522,4 @@ else:
 if wallcurrent:
     PostProc.PlotWallCurrent(f,TotalCurrent)
 ################################################################################
-pylab.show()
+# pylab.show()
