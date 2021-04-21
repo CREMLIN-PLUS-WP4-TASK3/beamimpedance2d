@@ -95,7 +95,7 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
 
 
     #Only this part changes wrt the real permeabiliy case!
-    a_curlcurl=  inner(Bmat(vvr),nur*Bmat(uvr))*dx(0)  -inner(vvr,-(omega/(beta*c0))**2 *nur*uvr)*dx(0)
+    a_curlcurl=  inner(Bmat(vvr),nur*Bmat(uvr))*dx(0)  -inner(vvr,-(omega/(beta*c0))**2 *nur*uvr)*dx(0) \
                 -inner(vvr,nui*ZAmat(usr,omega,beta))*dx(0)  \
                 -(inner(Bmat(vvr),nui*Bmat(uvi))*dx(0)  -inner(vvr,-(omega/(beta*c0))**2 *nui*uvi)*dx(0) ) \
                 -inner(vvr,nur*ZAmat(usi,omega,beta))*dx(0)  \
@@ -285,7 +285,7 @@ def CurlCurl(mesh,omega, beta, epsilon, kappa, nu, RHSsr, RHSsi, RHSvr,RHSvi):
     equation = a_curlcurl +a_kappa + a_epsilon == RHS
 
     ##################################################################################
-    Zero = Expression(('0','0','0','0','0','0'), degree=6)
+    Zero = Constant(('0','0','0','0','0','0'))
 
     def u0_boundary(x, on_boundary):    # returns boolean if x on boundary
         return on_boundary
