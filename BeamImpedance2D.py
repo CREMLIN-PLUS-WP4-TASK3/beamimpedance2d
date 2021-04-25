@@ -46,8 +46,8 @@ zero=Constant(0.0)
 #MeshFileName='simplepipeDeltaZt_S2'
 #MeshFileName='collimator_shifted'
 #####MeshFileName='simplepipeDeltaZt'
-MeshFileName='simplepipe'
-# MeshFileName='ThinShellPipeZt_eps'
+# MeshFileName='simplepipe'
+MeshFileName='ThinShellPipeZt_eps'
 #MeshFileName='fccCoating300'
 #MeshFileName='fcc'
 #MeshFileName='fccWithoutHole'
@@ -66,11 +66,10 @@ output_file = File('mesh.pvd')
 output_file << mesh
 output_file << subdomains
 
-
 ######################################################################################
 #Beam parameters (SI units)
-px=0.0  #x-position
-py=0.0  #y-position
+px=0.02  #x-position
+py=0.00  #y-position
 a=0.01  #beam radius
 s_mesh=1e-6   #Parameter for delta function representation
 eps=s_mesh*0.1   #Apply Delta-function representation on little smaller epsilon (safety-factor)
@@ -82,8 +81,9 @@ gamma_in=50000.0
 #beta=(1.0-1.0/gamma_in**2)**0.5
 
 #beta=0.947485301 #2GeV protons
-# beta=0.9999999 #roughly 7TeV
-beta=0.9
+beta=0.9999999 #roughly 7TeV
+# beta=0.9
+# beta=0.1
 
 gamma=1/sqrt(1-beta**2)
 bgsinv= 1.0/(beta**2 *gamma**2) # 1/(beta^2gamma^2)
@@ -112,10 +112,10 @@ g_ana=0.25+ln(b/a) #longitudinal space charge impedance geometry factor
 
 ###############################################################
 #Frequency stepping
-maxfpoints=5 #Number of frequency points to compute
+maxfpoints=30 #Number of frequency points to compute
 #logscale
-startfexp=5.0
-stopfexp=9.0
+startfexp=3.0
+stopfexp=7.0
 #linear scale
 startf=5e9
 stopf=5e9
@@ -232,13 +232,13 @@ else:
 
 if dipole:
     pass
-    # ZscTr_ana=numpy.zeros(maxfpoints, dtype="complex")
-    # ZscTr_ana_direct=numpy.zeros(maxfpoints, dtype="complex")
-    # ZscTr_ana_indirect=numpy.zeros(maxfpoints, dtype="complex")
-    # Ztrans_ind=numpy.zeros(maxfpoints, dtype="complex")
-    # Ztrans_full=numpy.zeros(maxfpoints, dtype="complex")
+    ZscTr_ana=numpy.zeros(maxfpoints, dtype="complex")
+    ZscTr_ana_direct=numpy.zeros(maxfpoints, dtype="complex")
+    ZscTr_ana_indirect=numpy.zeros(maxfpoints, dtype="complex")
+    Ztrans_ind=numpy.zeros(maxfpoints, dtype="complex")
+    Ztrans_full=numpy.zeros(maxfpoints, dtype="complex")
 else:
-    # Zsc_ana=numpy.zeros(maxfpoints, dtype="complex")
+    Zsc_ana=numpy.zeros(maxfpoints, dtype="complex")
     Zlong=numpy.zeros(maxfpoints, dtype="complex")
     # Zlongloss=numpy.zeros(maxfpoints, dtype="complex")
     # TotalCurrent=numpy.zeros(maxfpoints, dtype="complex")
@@ -282,25 +282,25 @@ for i, fpoint in enumerate(f):
     print ("fpoint: ", fpoint,"  f= ",fpoint/1e6,"MHz" )
 
     ###############################################################################
-    # #Analytical references
-    # if dipole:
-    #     if quadrupole:
-    #         ZscTr_ana_direct[i]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    #             scipy.special.iv(2,(omega*a)/(beta*gamma*c0))*scipy.special.kn(2,(omega*a)/(beta*gamma*c0))
-    #         ZscTr_ana_indirect[i]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    #             (scipy.special.iv(2,(omega*a)/(beta*gamma*c0)))**2 \
-    #             *scipy.special.kn(2,(omega*b)/(beta*gamma*c0))/scipy.special.iv(2,(omega*b)/(beta*gamma*c0))
-    #         ZscTr_ana[i]=ZscTr_ana_direct[i]+ZscTr_ana_indirect[i]
-    #     else:
-    #         ZscTr_ana_direct[i]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    #             scipy.special.iv(1,(omega*a)/(beta*gamma*c0))*scipy.special.kn(1,(omega*a)/(beta*gamma*c0))  #check me
-    #         ZscTr_ana_indirect[i]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
-    #             (scipy.special.iv(1,(omega*a)/(beta*gamma*c0)))**2 \
-    #             *scipy.special.kn(1,(omega*b)/(beta*gamma*c0))/scipy.special.iv(1,(omega*b)/(beta*gamma*c0))
-    #         ZscTr_ana[i]=ZscTr_ana_direct[i]+ZscTr_ana_indirect[i]
-    # else:
-    #     Zsc_ana[i]=-I*omega*mu0*bgsinv*g_ana/(2*pi)*length
-    #     #ZscTr_ana[i]=-I*bgsinv*(beta*c0*mu0)*(1.0/a**2-1.0/b**2) *length/(2*pi)  #MQS
+    #Analytical references
+    if dipole:
+        if quadrupole:
+            ZscTr_ana_direct[i]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+                scipy.special.iv(2,(omega*a)/(beta*gamma*c0))*scipy.special.kn(2,(omega*a)/(beta*gamma*c0))
+            ZscTr_ana_indirect[i]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+                (scipy.special.iv(2,(omega*a)/(beta*gamma*c0)))**2 \
+                *scipy.special.kn(2,(omega*b)/(beta*gamma*c0))/scipy.special.iv(2,(omega*b)/(beta*gamma*c0))
+            ZscTr_ana[i]=ZscTr_ana_direct[i]+ZscTr_ana_indirect[i]
+        else:
+            ZscTr_ana_direct[i]=-I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+                scipy.special.iv(1,(omega*a)/(beta*gamma*c0))*scipy.special.kn(1,(omega*a)/(beta*gamma*c0))  #check me
+            ZscTr_ana_indirect[i]=I*bgsinv*(beta*c0*mu0)*length/(pi*a**2)* \
+                (scipy.special.iv(1,(omega*a)/(beta*gamma*c0)))**2 \
+                *scipy.special.kn(1,(omega*b)/(beta*gamma*c0))/scipy.special.iv(1,(omega*b)/(beta*gamma*c0))
+            ZscTr_ana[i]=ZscTr_ana_direct[i]+ZscTr_ana_indirect[i]
+    else:
+        Zsc_ana[i]=-I*omega*mu0*bgsinv*g_ana/(2*pi)*length
+        #ZscTr_ana[i]=-I*bgsinv*(beta*c0*mu0)*(1.0/a**2-1.0/b**2) *length/(2*pi)  #MQS
     ################################################################################
 
     ###################################################################################################
@@ -509,41 +509,41 @@ for i, fpoint in enumerate(f):
 ##################################################################################################################
 
 #############################################################
-##Export impedance
-# if dataexport:
-#     ExportName=MeshFileName+'beta'+str(beta)
-#     if dipole:
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_full.dat',f,Ztrans_full)
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_ind.dat',f,Ztrans_ind)
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_full.dat',f,ZscTr_ana)
-#         PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_ind.dat',f,ZscTr_ana_indirect)
-#     else:
-#         PostProc.CplxImpExport(ExportName+'Zl.dat',f,Zlong)
-#     if wallcurrent:
-#         PostProc.CplxImpExport(ExportName+'ZlLoss.dat',f,Zlongloss)
-#         PostProc.CplxImpExport(ExportName+'Current.dat',f,TotalCurrent)
+# Export impedance
+if dataexport:
+    ExportName=MeshFileName+'beta'+str(beta)
+    if dipole:
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_full.dat',f,Ztrans_full)
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'horiz_'+str(horizontal)+'Ztr_ind.dat',f,Ztrans_ind)
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_full.dat',f,ZscTr_ana)
+        PostProc.CplxImpExport(ExportName+'_a'+str(a)+'_s'+str(s_mesh)+'Ztr_ana_ind.dat',f,ZscTr_ana_indirect)
+    else:
+        PostProc.CplxImpExport(ExportName+'Zl.dat',f,Zlong)
+    if wallcurrent:
+        PostProc.CplxImpExport(ExportName+'ZlLoss.dat',f,Zlongloss)
+        PostProc.CplxImpExport(ExportName+'Current.dat',f,TotalCurrent)
 
 #############################################################
 
 
 
-# #############################################################
-# #Plot impedance
-# if dipole:
-#     if quadrupole:
-#         PostProc.PlotZtrans(f,numpy.multiply(a**2,Ztrans_full),ZscTr_ana,'Full Transverse Impedance')
-#         #PostProc.PlotZtrans(f,Ztrans_full,numpy.multiply(1/(2*a**2),ZscTr_ana),'Full Transverse Impedance')
-#         PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
-#     else:
-#         #PostProc.PlotZtranslinear(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
-#         PostProc.PlotZtrans(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
-#         PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
-# else:
-#     if wallcurrent:
-#         PostProc.PlotZlong(f,Zlong,Zlongloss,Zsc_ana)
-#     else:
-#         PostProc.PlotZlong(f,Zlong,Zlong,Zsc_ana)
-# ##############################################################
+#############################################################
+#Plot impedance
+if dipole:
+    if quadrupole:
+        PostProc.PlotZtrans(f,numpy.multiply(a**2,Ztrans_full),ZscTr_ana,'Full Transverse Impedance')
+        PostProc.PlotZtrans(f,Ztrans_full,numpy.multiply(1/(2*a**2),ZscTr_ana),'Full Transverse Impedance')
+        PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
+    else:
+        PostProc.PlotZtranslinear(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
+        PostProc.PlotZtrans(f,Ztrans_full,ZscTr_ana,'Full Transverse Impedance')
+        PostProc.PlotZtrans(f,Ztrans_ind,ZscTr_ana_indirect,'Indirect Transverse Impedance')
+else:
+    if wallcurrent:
+        PostProc.PlotZlong(f,Zlong,Zlongloss,Zsc_ana)
+    else:
+        PostProc.PlotZlong(f,Zlong,Zlong,Zsc_ana)
+##############################################################
 
 
 # ################################################################################
@@ -551,4 +551,4 @@ for i, fpoint in enumerate(f):
 # if wallcurrent:
 #     PostProc.PlotWallCurrent(f,TotalCurrent)
 # ################################################################################
-# pylab.show()
+pylab.savefig('output.png')

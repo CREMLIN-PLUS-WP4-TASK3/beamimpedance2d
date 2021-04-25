@@ -230,8 +230,8 @@ Plane Surface(18) = {33,32,105,104};
 
 //Physical Surface(4) = {18};   //OutsideVac
 
-Physical Surface(1) = {1,2,3,4,5,6,7,8,9,10,11,12};   //beam   (+/-eps)
-Physical Surface(2) = {13,14,15,16,18,41,81,121,161};   //vacuum
+Physical Surface(1) = {1,2,3,4,5,6,7,8,9,10,11,12,13};   //beam   (+/-eps)
+Physical Surface(2) = {14,15,16,18,41,81,121,161};   //vacuum
 Physical Surface(3) = {17};   //Pipe
 
 

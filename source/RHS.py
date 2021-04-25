@@ -6,9 +6,9 @@ by Uwe Niedermayer 2014
 
 from dolfin import *
 
-# class Beam(SubDomain):
-#    def inside(self, x, a):
-#        return x[0]*x[0] + x[0]*x[0] < a+DOLFIN_EPS
+class Beam(SubDomain):
+   def inside(self, x, a):
+       return x[0]*x[0] + x[0]*x[0] < a+DOLFIN_EPS
 
 # """
 # class MyFunction(Expression):
@@ -20,26 +20,26 @@ from dolfin import *
 #             values[1] = 0.0
 # """
 
-# class Step(Expression):
-#     def eval(self, values, x):
-#         if x>0:
-#             values[0]=1
-#         else:
-#             values[0]=0
+class Step(Expression):
+    def eval(self, values, x):
+        if x>0:
+            values[0]=1
+        else:
+            values[0]=0
 
-# class Ring(Expression):
-#     def __init__(self,r1,r2,c1,c2):
-#         self.r1_=r1
-#         self.r2_=r2
-#         self.c1_=c1
-#         self.c2_=c2
+class Ring(Expression):
+    def __init__(self,r1,r2,c1,c2):
+        self.r1_=r1
+        self.r2_=r2
+        self.c1_=c1
+        self.c2_=c2
 
-#     def eval(self,values,x):
-#         r=((x[0]-self.c1_)**2+(x[1]-self.c2_)**2)**0.5
-#         if (r>self.r1_ and r<self.r2_):
-#             values[0]=1.0
-#         else:
-#             values[0]=0.0
+    def eval(self,values,x):
+        r=((x[0]-self.c1_)**2+(x[1]-self.c2_)**2)**0.5
+        if (r>self.r1_ and r<self.r2_):
+            values[0]=1.0
+        else:
+            values[0]=0.0
 
 class RingDipole(UserExpression):
     def __init__(self,a,eps,xd,yd,*args,**kwargs):
@@ -177,12 +177,14 @@ def ExCurrentShiftedDipole(mesh,subdomains,q,a,eps,xd,yd):
     if horizontal:
         DipTest=Expression('x[0]-xd',xd=xd, degree=2)
     else:
-        DipTest=Expression('x[1]-yd',yd=yd)
+        DipTest=Expression('x[1]-yd',yd=yd, degree=2)
 
     #DipExFunction=project(Source,Vdip)
     #Dipolemoment=assemble(DipExFunction*DipTest*dx)
     DipTestFunction=project(Source,Vdip)
     DipolemomentTEST=assemble(DipTestFunction*DipTest*dx)
+    if DipolemomentTEST==0:
+        DipolemomentTEST = DOLFIN_EPS
     print("Dipole Moment: " , DipolemomentTEST)
     #######################################
 

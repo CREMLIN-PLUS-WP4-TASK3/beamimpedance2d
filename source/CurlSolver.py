@@ -51,29 +51,16 @@ def ZAmat(scal,omega,beta):
 
 ###################################################################
 def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSvr,RHSvi):
-    domains = MeshFunction("size_t", mesh, mesh.topology().dim())
-    domains.set_all(0)
-    dx = Measure("dx")(subdomain_data=domains)
 
     ################################################################
     # SIBC
-    class AdmittanceBoundary(SubDomain):
-        def inside(self,x,on_boundary):
-            return on_boundary
 
-    AdmittanceBoundaryObject=AdmittanceBoundary()
-
-    Abdy = MeshFunction("size_t", mesh, mesh.topology().dim()-1)
-    Abdy.set_all(0)
-
-    AdmittanceBoundaryObject.mark(Abdy,0)
-    ds = Measure("ds")(subdomain_data=Abdy)
     n = -FacetNormal(mesh)  #Normal pointing inwards
     #plot(assemble(n,mesh=mesh),mesh=mesh,interactive=True)
     #plot(n,mesh=mesh)
     ################################################################
 
-    Vtr = VectorElement("Nedelec 1st kind H(curl)", mesh.ufl_cell(), curl_order)
+    Vtr = FiniteElement("Nedelec 1st kind H(curl)", mesh.ufl_cell(), curl_order)
     Vlr = FiniteElement("Lagrange", mesh.ufl_cell(), curl_long_order)
     Vli=Vlr
     Vti=Vtr
@@ -90,28 +77,27 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
     #Ecurlli=Function(Vli)
 
 
-    a_epsilon=-omega*omega*(inner(vvr,epsilon*uvr)*dx(0)  + inner(vvi,epsilon*uvi)*dx(0)  + inner(vsr,epsilon*usr)*dx(0)  + inner(vsi,epsilon*usi)*dx(0) )
-    a_kappa=omega*(inner(vvi,kappa*uvr)*dx(0)  - inner(vvr,kappa*uvi)*dx(0)  + inner(vsi,kappa*usr)*dx(0)  - inner(vsr,kappa*usi)*dx(0) )
-
+    a_epsilon=-omega*omega*(inner(vvr,epsilon*uvr)*dx  + inner(vvi,epsilon*uvi)*dx  + inner(vsr,epsilon*usr)*dx  + inner(vsi,epsilon*usi)*dx )
+    a_kappa=omega*(inner(vvi,kappa*uvr)*dx  - inner(vvr,kappa*uvi)*dx  + inner(vsi,kappa*usr)*dx  - inner(vsr,kappa*usi)*dx )
 
     #Only this part changes wrt the real permeabiliy case!
-    a_curlcurl=  inner(Bmat(vvr),nur*Bmat(uvr))*dx(0)  -inner(vvr,-(omega/(beta*c0))**2 *nur*uvr)*dx(0) \
-                -inner(vvr,nui*ZAmat(usr,omega,beta))*dx(0)  \
-                -(inner(Bmat(vvr),nui*Bmat(uvi))*dx(0)  -inner(vvr,-(omega/(beta*c0))**2 *nui*uvi)*dx(0) ) \
-                -inner(vvr,nur*ZAmat(usi,omega,beta))*dx(0)  \
-                -inner(Amat(vsr),nui*Zmat(uvr,omega,beta))*dx(0)  \
-                +inner(Amat(vsr),nur*Amat(usr))*dx(0)  \
-                -inner(Amat(vsr),nur*Zmat(uvi,omega,beta))*dx(0)  \
-                -inner(Amat(vsr),nui*Amat(usi))*dx(0)  \
+    a_curlcurl=  inner(Bmat(vvr),nur*Bmat(uvr))*dx  -inner(vvr,-(omega/(beta*c0))**2 *nur*uvr)*dx \
+                -inner(vvr,nui*ZAmat(usr,omega,beta))*dx  \
+                -(inner(Bmat(vvr),nui*Bmat(uvi))*dx  -inner(vvr,-(omega/(beta*c0))**2 *nui*uvi)*dx ) \
+                -inner(vvr,nur*ZAmat(usi,omega,beta))*dx  \
+                -inner(Amat(vsr),nui*Zmat(uvr,omega,beta))*dx  \
+                +inner(Amat(vsr),nur*Amat(usr))*dx  \
+                -inner(Amat(vsr),nur*Zmat(uvi,omega,beta))*dx  \
+                -inner(Amat(vsr),nui*Amat(usi))*dx  \
                 \
-                +inner(Bmat(vvi),nur*Bmat(uvi))*dx(0)  -inner(vvi,-(omega/(beta*c0))**2 *nur*uvi)*dx(0)  \
-                -inner(vvi,nui*ZAmat(usi,omega,beta))*dx(0)  \
-                +inner(Bmat(vvi),nui*Bmat(uvr))*dx(0)  -inner(vvi,-(omega/(beta*c0))**2 *nui*uvr)*dx(0) \
-                +inner(vvi,nur*ZAmat(usr,omega,beta))*dx(0)   \
-                -inner(Amat(vsi),nui*Zmat(uvi,omega,beta))*dx(0)  \
-                +inner(Amat(vsi),nur*Amat(usi))*dx(0)  \
-                +inner(Amat(vsi),nur*Zmat(uvr,omega,beta))*dx(0)  \
-                +inner(Amat(vsi),nui*Amat(usr))*dx(0)
+                +inner(Bmat(vvi),nur*Bmat(uvi))*dx  -inner(vvi,-(omega/(beta*c0))**2 *nur*uvi)*dx  \
+                -inner(vvi,nui*ZAmat(usi,omega,beta))*dx  \
+                +inner(Bmat(vvi),nui*Bmat(uvr))*dx  -inner(vvi,-(omega/(beta*c0))**2 *nui*uvr)*dx \
+                +inner(vvi,nur*ZAmat(usr,omega,beta))*dx   \
+                -inner(Amat(vsi),nui*Zmat(uvi,omega,beta))*dx  \
+                +inner(Amat(vsi),nur*Amat(usi))*dx  \
+                +inner(Amat(vsi),nur*Zmat(uvr,omega,beta))*dx  \
+                +inner(Amat(vsi),nui*Amat(usr))*dx
 
                 # testf, nu, ansatzf, tr/long: +rrrt
                 # testf, nu, ansatzf, t/l: -rirl
@@ -177,7 +163,7 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
         a_boundary=0
 
 
-    RHS=RHSsr*vsi*dx(0)  + RHSsi*vsi*dx(0)  + inner(RHSvr,vvr)*dx(0)  + inner(RHSvi,vvi) *dx(0)
+    RHS=RHSsr*vsi*dx  + RHSsi*vsi*dx  + inner(RHSvr,vvr)*dx  + inner(RHSvi,vvi) *dx
 
     equation = a_curlcurl +a_kappa + a_epsilon +a_boundary == RHS
 
@@ -185,18 +171,15 @@ def CurlCurlCplxNu(mesh,omega, beta, epsilon, kappa, nur,nui, RHSsr, RHSsi, RHSv
 
 
     ##################################################################################
-    Zero = Expression(('0','0','0','0','0','0'), degree=6)
+    Zero = Constant(('0','0','0','0','0','0'))
 
-    def u0_boundary(x, on_boundary):    # returns boolean if x on boundary
-        return on_boundary
-
-    ElectricBC=DirichletBC(V, Zero, u0_boundary)
+    ElectricBC=DirichletBC(V, Zero, lambda x, on_boundary: on_boundary)
     ####################################################################################
 
     ################
     # set_log_level(PROGRESS)
     if SIBC:
-        solve(equation, Ecurl,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
+        solve(equation, Ecurl,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
     else:
         solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
         # solve(equation, Ecurl,ElectricBC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
@@ -235,7 +218,7 @@ def CurlCurl(mesh,omega, beta, epsilon, kappa, nu, RHSsr, RHSsi, RHSvr,RHSvi):
     Vli = Vlr
     Vti = Vtr
 
-    V= FunctionSpace(mesh, MixedElement([Vtr, Vti, Vlr, Vli])) # 3D complex vector space
+    V= FunctionSpace(mesh, MixedElement(Vtr, Vti, Vlr, Vli)) # 3D complex vector space
 
     (uvr,uvi,usr,usi) = TrialFunctions(V)
     (vvr,vvi,vsr,vsi) = TestFunctions(V)
@@ -287,10 +270,7 @@ def CurlCurl(mesh,omega, beta, epsilon, kappa, nu, RHSsr, RHSsi, RHSvr,RHSvi):
     ##################################################################################
     Zero = Constant(('0','0','0','0','0','0'))
 
-    def u0_boundary(x, on_boundary):    # returns boolean if x on boundary
-        return on_boundary
-
-    ElectricBC=DirichletBC(V, Zero, u0_boundary)
+    ElectricBC=DirichletBC(V, Zero, lambda x, on_boundary: on_boundary)
     ####################################################################################
 
     ################

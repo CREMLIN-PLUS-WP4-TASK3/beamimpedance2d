@@ -44,7 +44,7 @@ builtins.logscale=True     #log or lin frequency stepping
 builtins.dispersive=False  #Only for dispersive material update is required, set false if nondispersive-->faster
 builtins.plot3Dflag=False#Make all 3D plots (use only for one frequency point)
 builtins.quadrupole=False       #Quadrupole transverse impedance (very preliminary!!!)
-builtins.dipole=False       #Dipole transverse impedance
+builtins.dipole=True       #Dipole transverse impedance
 builtins.horizontal=True     # Only relevant for dipole=True
 builtins.dataexport=True # Write (Overwrite) file in the result folder
 builtins.wallcurrent=False    #compute and export wall current
