@@ -6,49 +6,73 @@ by Uwe Niedermayer 2014
 
 from dolfin import *
 def CplxPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
-    H1 = FunctionSpace(mesh, "CG",div_long_order)    #Space for the Potential
-    Mix=H1*H1
-    
+    H1 = FiniteElement("Lagrange", mesh.ufl_cell(), div_long_order)    #Space for the Potential
+    Mix=FunctionSpace(mesh, MixedElement([H1, H1]))
+
     (ur,ui) = TrialFunctions(Mix)
     (vr,vi) = TestFunctions(Mix)
 
     Phi=Function(Mix)
-    Phir=Function(H1)
-    Phii=Function(H1)
-    
+
     #The stiffness matrices
-    ar=inner(grad(vr),epsilon*grad(ur))*dx +inner(grad(vr),(kappa/omega)*grad(ui))*dx 
-    ai=inner(grad(vi),epsilon*grad(ui))*dx -inner(grad(vi),(kappa/omega)*grad(ur))*dx  
-    
+    """
+    $
+    \int_\Omega{\nabla v^\Re \cdot \varepsilon \nabla u^\Re d\Omega}+
+    \int_\Omega{\nabla v^\Re \cdot \frac{\kappa}{\omega} \nabla u^\Im d\Omega}
+    $
+    $
+    \int_\Omega{\nabla v^\Im \cdot \varepsilon \nabla u^\Im d\Omega}-
+    \int_\Omega{\nabla v^\Im \cdot \frac{\kappa}{\omega} \nabla u^\Re d\Omega}
+    $
+    """
+    ar=inner(grad(vr),epsilon*grad(ur))*dx +inner(grad(vr),(kappa/omega)*grad(ui))*dx
+    ai=inner(grad(vi),epsilon*grad(ui))*dx -inner(grad(vi),(kappa/omega)*grad(ur))*dx
+
     #The mass matrices
+    """
+    $
+    \frac{\omega^2}{\beta^2 c^2}\left(
+    \int_\Omega{v^\Re \cdot \varepsilon u^\Re d\Omega}+
+    \int_\Omega{v^\Re \cdot \frac{\kappa}{\omega} u^\Im d\Omega}
+    \right)
+    $
+    $
+    \frac{\omega^2}{\beta^2 c^2}\left(
+    \int_\Omega{v^\Im \cdot \varepsilon u^\Im d\Omega}-
+    \int_\Omega{v^\Im \cdot \frac{\kappa}{\omega} u^\Re d\Omega}
+    \right)
+    $
+    """
     br=(omega/(beta*c0))**2 * (inner(vr,epsilon*ur)*dx +inner(vr,(kappa/omega)*ui)*dx )
     bi=(omega/(beta*c0))**2 * (inner(vi,epsilon*ui)*dx -inner(vi,(kappa/omega)*ur)*dx )
-    
+
     #The right hand side
+    """
+    $\frac{1}{\beta c}\int_\Omega{J_{sz}^\Re v^\Re d\Omega}$
+    $\frac{1}{\beta c}\int_\Omega{J_{sz}^\Im v^\Im d\Omega}$
+    """
     RHSr=1/(beta*c0) *vr*Jszr*dx
     RHSi=1/(beta*c0) *vi*Jszi*dx
-    
-    eq= ar+ai +br+bi==RHSr+RHSi
-    
-    
-    Zero = Expression(('0.0','0.0'))
-    def u0_boundary(x, on_boundary):    # returns boolean if x on boundary
-        return on_boundary
 
-    BC=DirichletBC(Mix, Zero, u0_boundary)
-    
-    
-    set_log_level(PROGRESS)
-    solve(eq, Phi,BC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
-    #solve(eq, Phi,BC,solver_parameters={"linear_solver": "gmres","preconditioner": "sor"})
-    #solve(eq, Phi,BC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
-    (Phir,Phii)=Phi.split(deepcopy=False) 
-    
+    eq= ar+ai +br+bi==RHSr+RHSi
+
+
+    Zero = Expression(('0.0','0.0'), degree=2)
+    BC=DirichletBC(Mix, Zero, lambda _, on_boundary: on_boundary)
+
+
+    # set_log_level(PROGRESS)
+    solve(eq,Phi,BC,solver_parameters={"linear_solver": "mumps","preconditioner": "none"})
+    # solve(eq, Phi,BC,solver_parameters={"linear_solver": "gmres","preconditioner": "ilu"})
+    # solve(eq, Phi,BC,solver_parameters={"linear_solver": "gmres","preconditioner": "sor"})
+    # solve(eq, Phi,BC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
+    (Phir,Phii)=Phi.split(deepcopy=True)
+
     if(plot3Dflag):
         plot(Phir,title='Phir')
         plot(Phii,title='Phii')
         interactive()
-    
+
     return [Phir,Phii]
 
 
@@ -64,8 +88,8 @@ def CplxMixedPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
     Mix = MixedFunctionSpace([H1, H1, Hdiv, Hdiv,Hdiv,Hdiv])
     (uPhir,uPhii, uDr,uDi,uJr,uJi) = TrialFunctions(Mix)
     (vPhir,vPhii, vDr,vDi,vJr,vJi) = TestFunctions(Mix)
-    
-    
+
+
     sol=Function(Mix)
     #Phir=Function(H1)
     #Phii=Function(H1)
@@ -73,14 +97,14 @@ def CplxMixedPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
     #Di=Function(Hdiv)
     #Jr=Function(Hdiv)
     #Ji=Function(Hdiv)
-    
-    
+
+
     aSrhsr=1/(beta*c0) *inner(vPhir,Jszr)*dx
     aSrhsi=1/(beta*c0) *inner(vPhii,Jszr)*dx
-    
+
     ar=-inner(grad(vPhir),uDr)*dx  -(1.0/omega)*inner(grad(vPhir),uJi)*dx
     ai=-inner(grad(vPhii),uDi)*dx  +(1.0/omega)*inner(grad(vPhii),uJi)*dx
-    
+
     aJr= kappa*dot(div(vJr),uPhir)*dx
     aJi= kappa*dot(div(vJi),uPhii)*dx
 
@@ -92,10 +116,10 @@ def CplxMixedPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
     bJr= inner(vJr,uJr)*dx
     bJi= inner(vJi,uJi)*dx
 
-    
+
     eq= ar+ai +aDr+aDi-bDr-bDi  +aJr+aJi-bJr-bJi== aSrhsr+aSrhsi
-    
-    
+
+
     Zero = Expression('0')
     VecZero=Expression(('0.0','0.0'))
     def u0_boundary(x, on_boundary):    # returns boolean if x on boundary
@@ -108,11 +132,11 @@ def CplxMixedPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
     bcttt=DirichletBC(Mix.sub(4), VecZero, u0_boundary)
     bctttt=DirichletBC(Mix.sub(5), VecZero, u0_boundary)
     BC=([bcPhir,bcPhii,bct,bctt,bcttt,bctttt])
-    
+
     set_log_level(PROGRESS)
     solve(eq, sol,BC,solver_parameters={"linear_solver": "lu","preconditioner": "none"})
-    (Phir,Phii,Dr,Di,Jr,Ji)=sol.split(deepcopy=True) 
-    
+    (Phir,Phii,Dr,Di,Jr,Ji)=sol.split(deepcopy=True)
+
     if(plot3Dflag):
         plot(Phir,title='Phir')
         plot(Phii,title='Phii')
@@ -121,6 +145,6 @@ def CplxMixedPoisson(mesh,omega, beta, epsilon, kappa, Jszr,Jszi):
         plot(Jr,title='Jr')
         plot(Ji,title='Ji')
         interactive()
-    
+
     return [Phir,Phii]
 """
